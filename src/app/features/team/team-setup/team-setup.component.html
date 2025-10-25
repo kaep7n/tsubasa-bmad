@@ -1,0 +1,129 @@
+<div class="team-setup-container">
+  <mat-card class="team-setup-card">
+    <mat-card-header>
+      <mat-card-title>Create Your Team</mat-card-title>
+      <mat-card-subtitle>Set up your team profile to get started</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="teamForm" (ngSubmit)="onSubmit()">
+        <!-- Team Name Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Team Name</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="teamName"
+            placeholder="e.g., Springfield Wildcats"
+            [attr.aria-label]="'Team name'"
+          />
+          <mat-icon matPrefix>groups</mat-icon>
+          @if (teamForm.get('teamName')?.invalid && teamForm.get('teamName')?.touched) {
+            <mat-error>{{ getErrorMessage('teamName') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Season Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Season</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="season"
+            placeholder="YYYY-YYYY"
+            [attr.aria-label]="'Season'"
+          />
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-hint>Format: YYYY-YYYY (e.g., 2024-2025)</mat-hint>
+          @if (teamForm.get('season')?.invalid && teamForm.get('season')?.touched) {
+            <mat-error>{{ getErrorMessage('season') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Logo Upload Section -->
+        <div class="logo-upload-section">
+          <label class="logo-label">Team Logo (Optional)</label>
+          <p class="logo-hint">Maximum file size: 2MB. Accepted formats: JPEG, PNG, GIF, WebP</p>
+
+          @if (!imagePreview) {
+            <div class="upload-area">
+              <input
+                #logoInput
+                type="file"
+                id="logoInput"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                (change)="onFileSelected($event)"
+                hidden
+              />
+              <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="logoInput.click()"
+                [disabled]="loading"
+              >
+                <mat-icon>upload</mat-icon>
+                Choose Image
+              </button>
+            </div>
+          }
+
+          @if (imagePreview) {
+            <div class="image-preview-container">
+              <img [src]="imagePreview" alt="Team logo preview" class="image-preview" />
+              <button
+                type="button"
+                mat-icon-button
+                color="warn"
+                class="remove-image-btn"
+                (click)="clearFileSelection()"
+                [disabled]="loading"
+                [attr.aria-label]="'Remove image'"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Upload Progress -->
+        @if (loading && uploadProgress > 0) {
+          <div class="upload-progress">
+            <mat-progress-spinner
+              mode="determinate"
+              [value]="uploadProgress"
+              diameter="40"
+            ></mat-progress-spinner>
+            <span class="progress-text">{{ uploadProgress }}%</span>
+          </div>
+        }
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            [disabled]="loading || teamForm.invalid"
+            class="submit-btn"
+          >
+            @if (loading) {
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Creating Team...</span>
+            } @else {
+              <span>Create Team</span>
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

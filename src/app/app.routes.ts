@@ -19,8 +19,13 @@ export const routes: Routes = [
     canActivate: [unauthGuard]
   },
   {
+    path: 'team-setup',
+    loadComponent: () => import('./features/team/team-setup/team-setup.component').then(m => m.TeamSetupComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'dashboard',
-    loadComponent: () => import('./app.component').then(m => m.AppComponent),
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
   {

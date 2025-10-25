@@ -1,0 +1,213 @@
+<div class="dashboard-container">
+  <!-- Offline Indicator -->
+  @if (!isOnline()) {
+    <div class="offline-indicator">
+      <mat-icon>cloud_off</mat-icon>
+      <span>Offline - showing cached data</span>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <!-- Header Skeleton -->
+      <div class="header-skeleton">
+        <div class="skeleton skeleton-circle"></div>
+        <div class="skeleton skeleton-text"></div>
+      </div>
+
+      <div class="content-grid">
+        <!-- Upcoming Events Skeleton -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-item"></div>
+          <div class="skeleton skeleton-item"></div>
+          <div class="skeleton skeleton-item"></div>
+        </div>
+
+        <!-- Recent Results Skeleton -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-item"></div>
+          <div class="skeleton skeleton-item"></div>
+          <div class="skeleton skeleton-item"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (!isLoading()) {
+    <!-- Team Header -->
+    <div class="team-header">
+      @if (team()?.logo_url) {
+        <img [src]="team()!.logo_url" alt="Team logo" class="team-logo" />
+      } @else {
+        <div class="team-logo-placeholder">
+          <mat-icon>groups</mat-icon>
+        </div>
+      }
+      <div class="team-info">
+        <h1 class="team-name">{{ team()?.name || 'My Team' }}</h1>
+        <p class="team-season">{{ team()?.season || '' }}</p>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Upcoming Events Section -->
+      <mat-card class="events-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>event</mat-icon>
+            Upcoming Events
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (hasUpcomingEvents()) {
+            <!-- Upcoming Games -->
+            @for (game of upcomingGames(); track game.id) {
+              <div class="event-item game-item" (click)="navigateToGame(game.id)">
+                <div class="event-icon">
+                  <mat-icon>sports_soccer</mat-icon>
+                </div>
+                <div class="event-details">
+                  <div class="event-title">vs {{ game.opponent }}</div>
+                  <div class="event-info">
+                    {{ formatDate(game.date) }}
+                    @if (game.start_time) {
+                      · {{ game.start_time }}
+                    }
+                    @if (game.location) {
+                      · {{ game.location }}
+                    }
+                  </div>
+                </div>
+                <div class="event-countdown">
+                  {{ getCountdown(game.date) }}
+                </div>
+              </div>
+            }
+
+            <!-- Upcoming Training -->
+            @for (training of upcomingTraining(); track training.id) {
+              <div class="event-item training-item" (click)="navigateToTraining(training.id)">
+                <div class="event-icon">
+                  <mat-icon>fitness_center</mat-icon>
+                </div>
+                <div class="event-details">
+                  <div class="event-title">Training Session</div>
+                  <div class="event-info">
+                    {{ formatDate(training.date) }} · {{ training.start_time }}
+                    @if (training.duration_minutes) {
+                      · {{ training.duration_minutes }} min
+                    }
+                    @if (training.location) {
+                      · {{ training.location }}
+                    }
+                  </div>
+                </div>
+                <div class="event-countdown">
+                  {{ getCountdown(training.date) }}
+                </div>
+              </div>
+            }
+          } @else {
+            <!-- Empty State -->
+            <div class="empty-state">
+              <mat-icon>event_note</mat-icon>
+              <p>No upcoming events</p>
+              <p class="empty-hint">Tap the + button to create a game or training session</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Recent Results Section -->
+      <mat-card class="results-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>emoji_events</mat-icon>
+            Recent Results
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (hasRecentGames()) {
+            @for (game of recentGames(); track game.id) {
+              <div class="result-item" (click)="navigateToGame(game.id)">
+                <div class="result-badge" [attr.data-result]="getResultBadge(game).color">
+                  {{ getResultBadge(game).label }}
+                </div>
+                <div class="result-details">
+                  <div class="result-opponent">vs {{ game.opponent }}</div>
+                  <div class="result-date">{{ formatDate(game.date) }}</div>
+                </div>
+                <div class="result-score">
+                  {{ game.our_score }} - {{ game.opponent_score }}
+                </div>
+              </div>
+            }
+          } @else {
+            <!-- Empty State -->
+            <div class="empty-state">
+              <mat-icon>sports_soccer</mat-icon>
+              <p>No games played yet</p>
+              <p class="empty-hint">Results will appear here after you complete games</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Floating Action Button (FAB) Menu -->
+  <div class="fab-container">
+    <button
+      mat-fab
+      color="primary"
+      class="fab-button"
+      [class.fab-open]="isFabOpen()"
+      (click)="toggleFab()"
+      aria-label="Quick actions"
+    >
+      <mat-icon>{{ isFabOpen() ? 'close' : 'add' }}</mat-icon>
+    </button>
+
+    <!-- Speed Dial Menu -->
+    @if (isFabOpen()) {
+      <div class="fab-menu">
+        <button
+          mat-mini-fab
+          color="accent"
+          class="fab-action"
+          (click)="navigateToAddPlayer()"
+          aria-label="Add player"
+        >
+          <mat-icon>person_add</mat-icon>
+        </button>
+
+        <button
+          mat-mini-fab
+          color="accent"
+          class="fab-action"
+          (click)="navigateToCreateGame()"
+          aria-label="Create game"
+        >
+          <mat-icon>sports_soccer</mat-icon>
+        </button>
+
+        <button
+          mat-mini-fab
+          color="accent"
+          class="fab-action"
+          (click)="navigateToCreateTraining()"
+          aria-label="Create training"
+        >
+          <mat-icon>fitness_center</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+</div>

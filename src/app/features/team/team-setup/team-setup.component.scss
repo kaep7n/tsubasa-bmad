@@ -1,0 +1,187 @@
+.team-setup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.team-setup-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+
+    mat-card-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      text-align: center;
+    }
+
+    mat-card-subtitle {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.logo-upload-section {
+  margin: 16px 0;
+
+  .logo-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .logo-hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0 0 12px 0;
+  }
+
+  .upload-area {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+    border: 2px dashed rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+
+    .image-preview {
+      display: block;
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .remove-image-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.upload-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+
+  .progress-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1976d2;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+
+  .submit-btn {
+    min-width: 180px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+
+    mat-spinner {
+      display: inline-block;
+      margin-right: 12px;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .team-setup-container {
+    padding: 12px;
+  }
+
+  .team-setup-card {
+    padding: 16px;
+
+    mat-card-header {
+      mat-card-title {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .logo-upload-section {
+    .image-preview-container {
+      .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+      }
+    }
+  }
+}

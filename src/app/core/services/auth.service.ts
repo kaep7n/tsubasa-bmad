@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { SupabaseService } from './supabase.service';
 import { User, AuthResponse } from '../models/user.model';
 import type { AuthError, User as SupabaseUser } from '@supabase/supabase-js';
+import { TeamService } from './team.service';
 
 /**
  * AuthService
@@ -20,7 +21,8 @@ export class AuthService {
 
   constructor(
     private supabase: SupabaseService,
-    private router: Router
+    private router: Router,
+    private teamService: TeamService
   ) {
     // Initialize auth state from Supabase session
     this.initializeAuthState();
@@ -218,6 +220,31 @@ export class AuthService {
     return this.currentUser$.pipe(
       map(user => user !== null)
     );
+  }
+
+  /**
+   * Check if user has a team and redirect appropriately after login
+   * Redirects to /team-setup if no team exists, otherwise to /dashboard
+   */
+  checkAndRedirectAfterLogin(): void {
+    this.teamService.getUserTeam()
+      .pipe(take(1))
+      .subscribe({
+        next: (team) => {
+          if (team) {
+            // User has a team, redirect to dashboard
+            this.router.navigate(['/dashboard']);
+          } else {
+            // User has no team, redirect to team setup
+            this.router.navigate(['/team-setup']);
+          }
+        },
+        error: (error) => {
+          console.error('Error checking team status:', error);
+          // On error, default to team setup to be safe
+          this.router.navigate(['/team-setup']);
+        }
+      });
   }
 
   /**

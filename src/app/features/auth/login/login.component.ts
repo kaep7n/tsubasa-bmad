@@ -70,8 +70,8 @@ export class LoginComponent implements OnInit {
         return;
       }
 
-      // Successful login - redirect to dashboard
-      this.router.navigate(['/dashboard']);
+      // Successful login - check for team and redirect appropriately
+      this.authService.checkAndRedirectAfterLogin();
     } catch (error) {
       this.errorMessage = 'An unexpected error occurred. Please try again.';
       this.loading = false;

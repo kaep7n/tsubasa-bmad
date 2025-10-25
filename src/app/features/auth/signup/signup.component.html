@@ -1,0 +1,125 @@
+<div class="signup-container">
+  <mat-card class="signup-card">
+    <mat-card-header>
+      <mat-card-title>Create Account</mat-card-title>
+      <mat-card-subtitle>Join Tsubasa today</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (errorMessage) {
+        <div class="error-message" role="alert">
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (successMessage) {
+        <div class="success-message" role="alert">
+          {{ successMessage }}
+        </div>
+      }
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            name="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+          @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            name="password"
+            formControlName="password"
+            placeholder="Create a strong password"
+            autocomplete="new-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword"
+          >
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (signupForm.get('password')?.value) {
+          <div class="password-strength">
+            <div class="password-strength-label">
+              <span>Password strength:</span>
+              <span class="strength-indicator" [class]="passwordStrength">
+                {{ passwordStrength | titlecase }}
+              </span>
+            </div>
+            <mat-progress-bar
+              [value]="passwordStrengthValue"
+              [color]="getPasswordStrengthColor()"
+              mode="determinate">
+            </mat-progress-bar>
+          </div>
+        }
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            [type]="hideConfirmPassword ? 'password' : 'text'"
+            name="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hideConfirmPassword = !hideConfirmPassword"
+            [attr.aria-label]="'Hide confirm password'"
+            [attr.aria-pressed]="hideConfirmPassword"
+          >
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched || signupForm.hasError('passwordMismatch')) {
+            <mat-error>{{ getConfirmPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width submit-button"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <mat-spinner diameter="20" class="inline-spinner"></mat-spinner>
+            <span>Creating account...</span>
+          } @else {
+            <span>Create Account</span>
+          }
+        </button>
+      </form>
+
+      <div class="login-link">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

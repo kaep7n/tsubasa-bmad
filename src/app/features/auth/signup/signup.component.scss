@@ -1,0 +1,150 @@
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 2rem;
+
+  mat-card-header {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    mat-card-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    mat-card-subtitle {
+      font-size: 1rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border-left: 4px solid #c62828;
+}
+
+.success-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border-left: 4px solid #2e7d32;
+}
+
+form {
+  mat-form-field {
+    margin-bottom: 1rem;
+
+    &:last-of-type {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+.password-strength {
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+
+  .password-strength-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+
+    span:first-child {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .strength-indicator {
+      font-weight: 500;
+
+      &.weak {
+        color: #f44336;
+      }
+
+      &.medium {
+        color: #ff9800;
+      }
+
+      &.strong {
+        color: #4caf50;
+      }
+    }
+  }
+
+  mat-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.submit-button {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+
+  .inline-spinner {
+    display: inline-block;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+}
+
+.login-link {
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+
+  a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.25rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .signup-container {
+    padding: 0.5rem;
+  }
+
+  .signup-card {
+    padding: 1.5rem;
+
+    mat-card-header mat-card-title {
+      font-size: 1.5rem;
+    }
+  }
+}

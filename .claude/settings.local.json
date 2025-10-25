@@ -3,7 +3,22 @@
     "allow": [
       "Bash(mkdir:*)",
       "Bash(md-tree explode:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(tree:*)",
+      "Bash(ng version:*)",
+      "Read(//c/users/mh/source/**)",
+      "Bash(npx:*)",
+      "Bash(cp:*)",
+      "Bash(rsync:*)",
+      "Bash(npm install:*)",
+      "Bash(ng add:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test:*)",
+      "Bash(timeout 30 npm start)",
+      "Bash(supabase:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

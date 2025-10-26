@@ -31,10 +31,10 @@ import { TrainingSession } from '../../core/models/training-session.model';
     MatIconModule,
     MatBadgeModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -49,19 +49,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isFabOpen = signal(false);
 
   // Computed signals
-  hasUpcomingEvents = computed(() =>
-    this.upcomingGames().length > 0 || this.upcomingTraining().length > 0
+  hasUpcomingEvents = computed(
+    () => this.upcomingGames().length > 0 || this.upcomingTraining().length > 0,
   );
 
-  hasRecentGames = computed(() =>
-    this.recentGames().length > 0
-  );
+  hasRecentGames = computed(() => this.recentGames().length > 0);
 
   constructor(
     private teamService: TeamService,
     private gameService: GameService,
     private trainingService: TrainingService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -84,21 +82,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.teamService.getUserTeam(),
       this.gameService.getUpcomingGames(3),
       this.trainingService.getUpcomingTrainingSessions(3),
-      this.gameService.getRecentGames(5)
-    ]).pipe(
-      takeUntil(this.destroy$),
-      finalize(() => this.isLoading.set(false))
-    ).subscribe({
-      next: ([team, upcomingGames, upcomingTraining, recentGames]) => {
-        this.team.set(team);
-        this.upcomingGames.set(upcomingGames);
-        this.upcomingTraining.set(upcomingTraining);
-        this.recentGames.set(recentGames);
-      },
-      error: (error) => {
-        console.error('Error loading dashboard data:', error);
-      }
-    });
+      this.gameService.getRecentGames(5),
+    ])
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.isLoading.set(false)),
+      )
+      .subscribe({
+        next: ([team, upcomingGames, upcomingTraining, recentGames]) => {
+          this.team.set(team);
+          this.upcomingGames.set(upcomingGames);
+          this.upcomingTraining.set(upcomingTraining);
+          this.recentGames.set(recentGames);
+        },
+        error: error => {
+          console.error('Error loading dashboard data:', error);
+        },
+      });
   }
 
   /**
@@ -170,7 +170,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return new Intl.DateTimeFormat('en-US', {
       weekday: 'short',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     }).format(date);
   }
 

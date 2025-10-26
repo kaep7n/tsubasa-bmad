@@ -4,20 +4,7 @@ import { Team } from '../models/team.model';
 import { Game } from '../models/game.model';
 import { TrainingSession } from '../models/training-session.model';
 import { SyncOperation } from '../models/sync-operation.model';
-
-/**
- * Player interface (will be fully defined in Epic 2)
- */
-export interface Player {
-  id: string;
-  team_id: string;
-  coach_id: string;
-  name: string;
-  position?: string;
-  jersey_number?: number;
-  created_at: Date;
-  updated_at: Date;
-}
+import { Player } from '../../models/player.model';
 
 /**
  * Goal interface (will be fully defined in Epic 4)
@@ -122,7 +109,7 @@ export class TsubasaDatabase extends Dexie {
       training_attendance: 'id, training_id, player_id, status',
 
       // Sync queue table - auto-increment id, indexed by timestamp and synced status
-      sync_queue: '++id, timestamp, synced, table'
+      sync_queue: '++id, timestamp, synced, table',
     });
   }
 }
@@ -132,7 +119,7 @@ export class TsubasaDatabase extends Dexie {
  * Provides access to IndexedDB via Dexie
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DatabaseService {
   public db: TsubasaDatabase;
@@ -167,7 +154,7 @@ export class DatabaseService {
       games: await this.db.games.count(),
       training_sessions: await this.db.training_sessions.count(),
       goals: await this.db.goals.count(),
-      sync_queue: await this.db.sync_queue.count()
+      sync_queue: await this.db.sync_queue.count(),
     };
   }
 }

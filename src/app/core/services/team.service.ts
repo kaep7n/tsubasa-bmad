@@ -10,7 +10,7 @@ import { getFileExtension } from '../../shared/utils/image-resize.util';
  * Handles team CRUD operations and logo uploads to Supabase Storage
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TeamService {
   private readonly BUCKET_NAME = 'team-logos';
@@ -24,9 +24,7 @@ export class TeamService {
    * @returns Observable<TeamResponse>
    */
   createTeam(name: string, season: string): Observable<TeamResponse> {
-    return from(
-      this.supabase.client.auth.getUser()
-    ).pipe(
+    return from(this.supabase.client.auth.getUser()).pipe(
       switchMap(({ data: { user }, error: authError }) => {
         if (authError || !user) {
           return throwError(() => new Error('User not authenticated'));
@@ -35,16 +33,10 @@ export class TeamService {
         const teamData: CreateTeamRequest = {
           name,
           season,
-          created_by: user.id
+          created_by: user.id,
         };
 
-        return from(
-          this.supabase.client
-            .from('teams')
-            .insert(teamData)
-            .select()
-            .single()
-        );
+        return from(this.supabase.client.from('teams').insert(teamData).select().single());
       }),
       map(({ data, error }) => {
         if (error) {
@@ -52,14 +44,14 @@ export class TeamService {
             team: null,
             error: {
               message: error.message || 'Failed to create team',
-              status: error.code ? parseInt(error.code) : 500
-            }
+              status: error.code ? parseInt(error.code) : 500,
+            },
           };
         }
 
         return {
           team: this.mapTeamData(data),
-          error: null
+          error: null,
         };
       }),
       catchError(error => {
@@ -67,10 +59,10 @@ export class TeamService {
           team: null,
           error: {
             message: error.message || 'An unexpected error occurred',
-            status: 500
-          }
+            status: 500,
+          },
         }));
-      })
+      }),
     );
   }
 
@@ -85,14 +77,12 @@ export class TeamService {
     const filePath = `${teamId}.${fileExtension}`;
 
     return from(
-      this.supabase.client.storage
-        .from(this.BUCKET_NAME)
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true // Replace existing file if present
-        })
+      this.supabase.client.storage.from(this.BUCKET_NAME).upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true, // Replace existing file if present
+      }),
     ).pipe(
-      switchMap(({ data, error }) => {
+      switchMap(({ error }) => {
         if (error) {
           return throwError(() => new Error(`Upload failed: ${error.message}`));
         }
@@ -111,7 +101,7 @@ export class TeamService {
       catchError(error => {
         console.error('Logo upload error:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -126,7 +116,7 @@ export class TeamService {
       this.supabase.client
         .from('teams')
         .update({ logo_url: logoUrl, updated_at: new Date().toISOString() })
-        .eq('id', teamId)
+        .eq('id', teamId),
     ).pipe(
       map(({ error }) => {
         if (error) {
@@ -136,7 +126,7 @@ export class TeamService {
       catchError(error => {
         console.error('Logo update error:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -145,20 +135,14 @@ export class TeamService {
    * @returns Observable<Team | null>
    */
   getUserTeam(): Observable<Team | null> {
-    return from(
-      this.supabase.client.auth.getUser()
-    ).pipe(
+    return from(this.supabase.client.auth.getUser()).pipe(
       switchMap(({ data: { user }, error: authError }) => {
         if (authError || !user) {
           return from([null]);
         }
 
         return from(
-          this.supabase.client
-            .from('teams')
-            .select('*')
-            .eq('created_by', user.id)
-            .single()
+          this.supabase.client.from('teams').select('*').eq('created_by', user.id).single(),
         ).pipe(
           map(({ data, error }) => {
             // If no team found, return null (not an error)
@@ -172,13 +156,13 @@ export class TeamService {
             }
 
             return data ? this.mapTeamData(data) : null;
-          })
+          }),
         );
       }),
       catchError(error => {
         console.error('Unexpected error fetching team:', error);
         return from([null]);
-      })
+      }),
     );
   }
 
@@ -188,13 +172,7 @@ export class TeamService {
    * @returns Observable<Team | null>
    */
   getTeamById(teamId: string): Observable<Team | null> {
-    return from(
-      this.supabase.client
-        .from('teams')
-        .select('*')
-        .eq('id', teamId)
-        .single()
-    ).pipe(
+    return from(this.supabase.client.from('teams').select('*').eq('id', teamId).single()).pipe(
       map(({ data, error }) => {
         if (error) {
           console.error('Error fetching team:', error);
@@ -203,7 +181,7 @@ export class TeamService {
 
         return data ? this.mapTeamData(data) : null;
       }),
-      catchError(() => from([null]))
+      catchError(() => from([null])),
     );
   }
 
@@ -220,7 +198,7 @@ export class TeamService {
       logo_url: data.logo_url,
       created_by: data.created_by,
       created_at: new Date(data.created_at),
-      updated_at: new Date(data.updated_at)
+      updated_at: new Date(data.updated_at),
     };
   }
 }

@@ -9,7 +9,7 @@ import { TrainingSession, TrainingStatus } from '../models/training-session.mode
  * Handles training session CRUD operations and queries
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TrainingService {
   constructor(private supabase: SupabaseService) {}
@@ -19,7 +19,7 @@ export class TrainingService {
    * @param limit Number of sessions to return (default: 3)
    * @returns Observable<TrainingSession[]> sorted by date ascending
    */
-  getUpcomingTrainingSessions(limit: number = 3): Observable<TrainingSession[]> {
+  getUpcomingTrainingSessions(limit = 3): Observable<TrainingSession[]> {
     const today = new Date().toISOString().split('T')[0];
 
     return from(
@@ -29,7 +29,7 @@ export class TrainingService {
         .gte('date', today)
         .neq('status', 'cancelled')
         .order('date', { ascending: true })
-        .limit(limit)
+        .limit(limit),
     ).pipe(
       map(({ data, error }) => {
         if (error) {
@@ -38,7 +38,7 @@ export class TrainingService {
         }
         return data ? data.map(this.mapTrainingData) : [];
       }),
-      catchError(() => from([[]]))
+      catchError(() => from([[]])),
     );
   }
 
@@ -49,11 +49,7 @@ export class TrainingService {
    */
   getTrainingById(id: string): Observable<TrainingSession | null> {
     return from(
-      this.supabase.client
-        .from('training_sessions')
-        .select('*')
-        .eq('id', id)
-        .single()
+      this.supabase.client.from('training_sessions').select('*').eq('id', id).single(),
     ).pipe(
       map(({ data, error }) => {
         if (error) {
@@ -62,7 +58,7 @@ export class TrainingService {
         }
         return data ? this.mapTrainingData(data) : null;
       }),
-      catchError(() => from([null]))
+      catchError(() => from([null])),
     );
   }
 
@@ -81,7 +77,7 @@ export class TrainingService {
       location: data.location,
       status: data.status as TrainingStatus,
       created_at: new Date(data.created_at),
-      updated_at: new Date(data.updated_at)
+      updated_at: new Date(data.updated_at),
     };
   }
 }

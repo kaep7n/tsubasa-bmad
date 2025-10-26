@@ -1,0 +1,131 @@
+<div class="squad-management-container">
+  <div class="header">
+    <div class="header-left">
+      <button mat-icon-button (click)="cancel()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Squad Management</h1>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="!hasChanges || isSaving()">
+        @if (isSaving()) {
+        <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+        <mat-icon>save</mat-icon>
+        }
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading players...</p>
+  </div>
+  } @else {
+  <div class="squad-columns">
+    <!-- Unassigned Players -->
+    <div class="squad-column">
+      <div class="column-header unassigned">
+        <mat-icon>group</mat-icon>
+        <h2>Unassigned</h2>
+        <span class="count">{{ unassigned().length }}</span>
+      </div>
+      <div
+        cdkDropList
+        #unassignedList="cdkDropList"
+        [cdkDropListData]="unassigned()"
+        [cdkDropListConnectedTo]="[startersList, substitutesList]"
+        (cdkDropListDropped)="drop($event, null)"
+        class="player-list"
+      >
+        @for (player of unassigned(); track player.id) {
+        <div class="player-card" cdkDrag>
+          <div class="player-info">
+            @if (player.jersey_number) {
+            <span class="jersey-number">#{{ player.jersey_number }}</span>
+            }
+            <span class="player-name">{{ getPlayerName(player) }}</span>
+          </div>
+          <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>All players assigned</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Starters -->
+    <div class="squad-column">
+      <div class="column-header starters">
+        <mat-icon>stars</mat-icon>
+        <h2>Starters</h2>
+        <span class="count">{{ starters().length }}</span>
+      </div>
+      <div
+        cdkDropList
+        #startersList="cdkDropList"
+        [cdkDropListData]="starters()"
+        [cdkDropListConnectedTo]="[unassignedList, substitutesList]"
+        (cdkDropListDropped)="drop($event, 'starters')"
+        class="player-list"
+      >
+        @for (player of starters(); track player.id) {
+        <div class="player-card" cdkDrag>
+          <div class="player-info">
+            @if (player.jersey_number) {
+            <span class="jersey-number">#{{ player.jersey_number }}</span>
+            }
+            <span class="player-name">{{ getPlayerName(player) }}</span>
+          </div>
+          <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <mat-icon>sports_soccer</mat-icon>
+          <p>Drag players here</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Substitutes -->
+    <div class="squad-column">
+      <div class="column-header substitutes">
+        <mat-icon>group_add</mat-icon>
+        <h2>Substitutes</h2>
+        <span class="count">{{ substitutes().length }}</span>
+      </div>
+      <div
+        cdkDropList
+        #substitutesList="cdkDropList"
+        [cdkDropListData]="substitutes()"
+        [cdkDropListConnectedTo]="[unassignedList, startersList]"
+        (cdkDropListDropped)="drop($event, 'substitutes')"
+        class="player-list"
+      >
+        @for (player of substitutes(); track player.id) {
+        <div class="player-card" cdkDrag>
+          <div class="player-info">
+            @if (player.jersey_number) {
+            <span class="jersey-number">#{{ player.jersey_number }}</span>
+            }
+            <span class="player-name">{{ getPlayerName(player) }}</span>
+          </div>
+          <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <mat-icon>groups</mat-icon>
+          <p>Drag players here</p>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>

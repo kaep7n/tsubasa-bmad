@@ -24,7 +24,7 @@ describe('DashboardComponent', () => {
     logo_url: 'https://example.com/logo.png',
     created_by: 'user-1',
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
 
   const mockUpcomingGame: Game = {
@@ -38,7 +38,7 @@ describe('DashboardComponent', () => {
     our_score: 0,
     opponent_score: 0,
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
 
   const mockCompletedGame: Game = {
@@ -52,7 +52,7 @@ describe('DashboardComponent', () => {
     our_score: 3,
     opponent_score: 1,
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
 
   const mockTraining: TrainingSession = {
@@ -64,7 +64,7 @@ describe('DashboardComponent', () => {
     location: 'Training Ground',
     status: 'scheduled',
     created_at: new Date(),
-    updated_at: new Date()
+    updated_at: new Date(),
   };
 
   beforeEach(async () => {
@@ -85,8 +85,8 @@ describe('DashboardComponent', () => {
         { provide: TeamService, useValue: mockTeamService },
         { provide: GameService, useValue: mockGameService },
         { provide: TrainingService, useValue: mockTrainingService },
-        { provide: Router, useValue: mockRouter }
-      ]
+        { provide: Router, useValue: mockRouter },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);

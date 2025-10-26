@@ -14,22 +14,22 @@ describe('AuthService', () => {
     // Create mock Supabase client with auth methods
     mockSupabaseClient = {
       auth: {
-        getSession: jasmine.createSpy('getSession').and.returnValue(
-          Promise.resolve({ data: { session: null }, error: null })
-        ),
+        getSession: jasmine
+          .createSpy('getSession')
+          .and.returnValue(Promise.resolve({ data: { session: null }, error: null })),
         onAuthStateChange: jasmine.createSpy('onAuthStateChange').and.returnValue({
-          data: { subscription: { unsubscribe: () => {} } }
+          data: { subscription: { unsubscribe: () => {} } },
         }),
         signUp: jasmine.createSpy('signUp'),
         signInWithPassword: jasmine.createSpy('signInWithPassword'),
         signInWithOAuth: jasmine.createSpy('signInWithOAuth'),
-        signOut: jasmine.createSpy('signOut')
-      }
+        signOut: jasmine.createSpy('signOut'),
+      },
     };
 
     // Create mock SupabaseService
     mockSupabaseService = {
-      client: mockSupabaseClient
+      client: mockSupabaseClient,
     } as any;
 
     // Create mock Router
@@ -39,8 +39,8 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: SupabaseService, useValue: mockSupabaseService },
-        { provide: Router, useValue: mockRouter }
-      ]
+        { provide: Router, useValue: mockRouter },
+      ],
     });
 
     service = TestBed.inject(AuthService);
@@ -55,7 +55,7 @@ describe('AuthService', () => {
       const mockUser = {
         id: 'test-id',
         email: 'test@example.com',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       const mockResponse = {
@@ -67,10 +67,10 @@ describe('AuthService', () => {
             expires_in: 3600,
             expires_at: Date.now() + 3600000,
             token_type: 'bearer',
-            user: mockUser
-          }
+            user: mockUser,
+          },
         },
-        error: null
+        error: null,
       };
 
       mockSupabaseClient.auth.signUp.and.returnValue(Promise.resolve(mockResponse));
@@ -82,19 +82,19 @@ describe('AuthService', () => {
       expect(result.user?.email).toBe('test@example.com');
       expect(mockSupabaseClient.auth.signUp).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       });
     });
 
     it('should return error when signup fails', async () => {
       const mockError = {
         message: 'User already registered',
-        status: 400
+        status: 400,
       };
 
       const mockResponse = {
         data: { user: null, session: null },
-        error: mockError
+        error: mockError,
       };
 
       mockSupabaseClient.auth.signUp.and.returnValue(Promise.resolve(mockResponse));
@@ -112,7 +112,7 @@ describe('AuthService', () => {
       const mockUser = {
         id: 'test-id',
         email: 'test@example.com',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       const mockResponse = {
@@ -124,10 +124,10 @@ describe('AuthService', () => {
             expires_in: 3600,
             expires_at: Date.now() + 3600000,
             token_type: 'bearer',
-            user: mockUser
-          }
+            user: mockUser,
+          },
         },
-        error: null
+        error: null,
       };
 
       mockSupabaseClient.auth.signInWithPassword.and.returnValue(Promise.resolve(mockResponse));
@@ -139,19 +139,19 @@ describe('AuthService', () => {
       expect(result.session).toBeDefined();
       expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       });
     });
 
     it('should return error for invalid credentials', async () => {
       const mockError = {
         message: 'Invalid login credentials',
-        status: 400
+        status: 400,
       };
 
       const mockResponse = {
         data: { user: null, session: null },
-        error: mockError
+        error: mockError,
       };
 
       mockSupabaseClient.auth.signInWithPassword.and.returnValue(Promise.resolve(mockResponse));
@@ -168,7 +168,7 @@ describe('AuthService', () => {
     it('should initiate Google OAuth flow', async () => {
       const mockResponse = {
         data: { provider: 'google', url: 'https://accounts.google.com/oauth' },
-        error: null
+        error: null,
       };
 
       mockSupabaseClient.auth.signInWithOAuth.and.returnValue(Promise.resolve(mockResponse));
@@ -179,20 +179,20 @@ describe('AuthService', () => {
       expect(mockSupabaseClient.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
         options: {
-          redirectTo: jasmine.stringContaining('/auth/callback')
-        }
+          redirectTo: jasmine.stringContaining('/auth/callback'),
+        },
       });
     });
 
     it('should return error when OAuth fails', async () => {
       const mockError = {
         message: 'OAuth error',
-        status: 500
+        status: 500,
       };
 
       const mockResponse = {
         data: null,
-        error: mockError
+        error: mockError,
       };
 
       mockSupabaseClient.auth.signInWithOAuth.and.returnValue(Promise.resolve(mockResponse));
@@ -215,9 +215,7 @@ describe('AuthService', () => {
     });
 
     it('should redirect to login even if signOut fails', async () => {
-      mockSupabaseClient.auth.signOut.and.returnValue(
-        Promise.reject(new Error('Sign out failed'))
-      );
+      mockSupabaseClient.auth.signOut.and.returnValue(Promise.reject(new Error('Sign out failed')));
 
       await service.signOut();
 
@@ -226,18 +224,18 @@ describe('AuthService', () => {
   });
 
   describe('getCurrentUser', () => {
-    it('should return observable of current user', (done) => {
+    it('should return observable of current user', done => {
       service.getCurrentUser().subscribe(user => {
         expect(user).toBeNull();
         done();
       });
     });
 
-    it('should emit user when authenticated', (done) => {
+    it('should emit user when authenticated', done => {
       const mockUser: User = {
         id: 'test-id',
         email: 'test@example.com',
-        created_at: new Date()
+        created_at: new Date(),
       };
 
       // Simulate user authentication by directly setting the subject
@@ -252,18 +250,18 @@ describe('AuthService', () => {
   });
 
   describe('isAuthenticated', () => {
-    it('should return false when no user is authenticated', (done) => {
+    it('should return false when no user is authenticated', done => {
       service.isAuthenticated().subscribe(isAuth => {
         expect(isAuth).toBe(false);
         done();
       });
     });
 
-    it('should return true when user is authenticated', (done) => {
+    it('should return true when user is authenticated', done => {
       const mockUser: User = {
         id: 'test-id',
         email: 'test@example.com',
-        created_at: new Date()
+        created_at: new Date(),
       };
 
       (service as any).currentUserSubject.next(mockUser);

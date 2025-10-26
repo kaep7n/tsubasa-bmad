@@ -12,7 +12,11 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { timer } from 'rxjs';
 import { take, retry } from 'rxjs/operators';
 import { TeamService } from '../../../core/services/team.service';
-import { resizeImage, validateImageSize, validateImageType } from '../../../shared/utils/image-resize.util';
+import {
+  resizeImage,
+  validateImageSize,
+  validateImageType,
+} from '../../../shared/utils/image-resize.util';
 
 /**
  * TeamSetupComponent
@@ -30,10 +34,10 @@ import { resizeImage, validateImageSize, validateImageType } from '../../../shar
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
   ],
   templateUrl: './team-setup.component.html',
-  styleUrls: ['./team-setup.component.scss']
+  styleUrls: ['./team-setup.component.scss'],
 })
 export class TeamSetupComponent implements OnInit {
   teamForm: FormGroup;
@@ -51,11 +55,11 @@ export class TeamSetupComponent implements OnInit {
     private fb: FormBuilder,
     private teamService: TeamService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.teamForm = this.fb.group({
       teamName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      season: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{4}$/)]]
+      season: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{4}$/)]],
     });
   }
 
@@ -64,7 +68,7 @@ export class TeamSetupComponent implements OnInit {
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
     this.teamForm.patchValue({
-      season: `${currentYear}-${nextYear}`
+      season: `${currentYear}-${nextYear}`,
     });
   }
 
@@ -98,7 +102,7 @@ export class TeamSetupComponent implements OnInit {
 
     // Generate preview
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       this.imagePreview = e.target?.result as string;
     };
     reader.readAsDataURL(file);
@@ -132,7 +136,8 @@ export class TeamSetupComponent implements OnInit {
     const { teamName, season } = this.teamForm.value;
 
     // Step 1: Create team
-    this.teamService.createTeam(teamName, season)
+    this.teamService
+      .createTeam(teamName, season)
       .pipe(
         take(1),
         retry({
@@ -140,11 +145,11 @@ export class TeamSetupComponent implements OnInit {
           delay: (error, retryCount) => {
             console.log(`Retry attempt ${retryCount}:`, error);
             return timer(Math.min(1000 * Math.pow(2, retryCount - 1), 10000));
-          }
-        })
+          },
+        }),
       )
       .subscribe({
-        next: (response) => {
+        next: response => {
           if (response.error) {
             this.errorMessage = response.error.message;
             this.loading = false;
@@ -167,11 +172,11 @@ export class TeamSetupComponent implements OnInit {
             this.onSuccess();
           }
         },
-        error: (error) => {
+        error: error => {
           console.error('Team creation error:', error);
           this.errorMessage = error.error?.message || 'Failed to create team. Please try again.';
           this.loading = false;
-        }
+        },
       });
   }
 
@@ -186,51 +191,61 @@ export class TeamSetupComponent implements OnInit {
 
     // Resize image before upload
     resizeImage(this.selectedFile, 512, 512, 0.9)
-      .then((resizedFile) => {
+      .then(resizedFile => {
         this.uploadProgress = 50;
 
         // Upload to Supabase Storage
-        this.teamService.uploadTeamLogo(teamId, resizedFile)
+        this.teamService
+          .uploadTeamLogo(teamId, resizedFile)
           .pipe(
             take(1),
             retry({
               count: 2,
-              delay: 1000
-            })
+              delay: 1000,
+            }),
           )
           .subscribe({
-            next: (logoUrl) => {
+            next: logoUrl => {
               this.uploadProgress = 80;
 
               // Update team record with logo URL
-              this.teamService.updateTeamLogo(teamId, logoUrl)
+              this.teamService
+                .updateTeamLogo(teamId, logoUrl)
                 .pipe(take(1))
                 .subscribe({
                   next: () => {
                     this.uploadProgress = 100;
                     this.onSuccess();
                   },
-                  error: (error) => {
+                  error: error => {
                     console.error('Logo update error:', error);
                     // Team is created but logo update failed - still count as success
-                    this.snackBar.open('Team created, but logo update failed. You can update it later.', 'OK', {
-                      duration: 5000
-                    });
+                    this.snackBar.open(
+                      'Team created, but logo update failed. You can update it later.',
+                      'OK',
+                      {
+                        duration: 5000,
+                      },
+                    );
                     this.onSuccess();
-                  }
+                  },
                 });
             },
-            error: (error) => {
+            error: error => {
               console.error('Logo upload error:', error);
               // Team is created but logo upload failed - still count as success
-              this.snackBar.open('Team created, but logo upload failed. You can add it later.', 'OK', {
-                duration: 5000
-              });
+              this.snackBar.open(
+                'Team created, but logo upload failed. You can add it later.',
+                'OK',
+                {
+                  duration: 5000,
+                },
+              );
               this.onSuccess();
-            }
+            },
           });
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Image resize error:', error);
         this.errorMessage = 'Failed to process image. Please try a different file.';
         this.loading = false;

@@ -1,0 +1,245 @@
+.squad-management-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+
+  .header-actions {
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .header-actions {
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+
+  p {
+    margin-top: 1rem;
+    color: #666;
+  }
+}
+
+.squad-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.squad-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px 8px 0 0;
+  color: white;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .count {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &.unassigned {
+    background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+  }
+
+  &.starters {
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  }
+
+  &.substitutes {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  }
+}
+
+.player-list {
+  flex: 1;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 1rem;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &.cdk-drop-list-dragging {
+    background: #e8f5e9;
+  }
+}
+
+.player-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #2196f3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+  }
+
+  &.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .player-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+
+    .jersey-number {
+      background: #3f51b5;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 14px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .player-name {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+
+  .drag-handle {
+    color: #999;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #999;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// CDK Drag Drop Placeholder
+.cdk-drag-placeholder {
+  background: #e3f2fd;
+  border: 2px dashed #2196f3;
+  opacity: 0.5;
+}
+
+// Mobile adjustments
+@media (max-width: 768px) {
+  .squad-management-container {
+    padding: 0.5rem;
+  }
+
+  .squad-columns {
+    gap: 1rem;
+  }
+
+  .player-card {
+    padding: 0.5rem 0.75rem;
+
+    .player-info {
+      .jersey-number {
+        font-size: 12px;
+        padding: 2px 6px;
+        min-width: 24px;
+      }
+
+      .player-name {
+        font-size: 14px;
+      }
+    }
+  }
+}

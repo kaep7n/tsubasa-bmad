@@ -15,9 +15,9 @@
  */
 export async function resizeImage(
   file: File,
-  maxWidth: number = 512,
-  maxHeight: number = 512,
-  quality: number = 0.9
+  maxWidth = 512,
+  maxHeight = 512,
+  quality = 0.9,
 ): Promise<File> {
   return new Promise((resolve, reject) => {
     // Validate file is an image
@@ -50,18 +50,24 @@ export async function resizeImage(
         // Draw the center-cropped, resized image
         ctx.drawImage(
           img,
-          left, top, size, size,  // Source rectangle (center crop)
-          0, 0, maxWidth, maxHeight  // Destination rectangle
+          left,
+          top,
+          size,
+          size, // Source rectangle (center crop)
+          0,
+          0,
+          maxWidth,
+          maxHeight, // Destination rectangle
         );
 
         // Convert canvas to blob
         canvas.toBlob(
-          (blob) => {
+          blob => {
             if (blob) {
               // Create new File from blob with original name and type
               const resizedFile = new File([blob], file.name, {
                 type: file.type,
-                lastModified: Date.now()
+                lastModified: Date.now(),
               });
               resolve(resizedFile);
             } else {
@@ -69,7 +75,7 @@ export async function resizeImage(
             }
           },
           file.type,
-          quality
+          quality,
         );
       } catch (error) {
         reject(error);
@@ -96,7 +102,7 @@ export async function resizeImage(
  * @param maxSizeBytes Maximum file size in bytes (default: 2MB)
  * @returns True if file size is valid
  */
-export function validateImageSize(file: File, maxSizeBytes: number = 2097152): boolean {
+export function validateImageSize(file: File, maxSizeBytes = 2097152): boolean {
   return file.size <= maxSizeBytes;
 }
 
@@ -109,7 +115,7 @@ export function validateImageSize(file: File, maxSizeBytes: number = 2097152): b
  */
 export function validateImageType(
   file: File,
-  allowedTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+  allowedTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
 ): boolean {
   return allowedTypes.includes(file.type);
 }

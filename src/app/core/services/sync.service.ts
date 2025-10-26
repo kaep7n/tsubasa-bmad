@@ -9,7 +9,7 @@ import { SyncOperation, SyncState, SyncStatus } from '../models/sync-operation.m
  * Manages offline queue and synchronization with Supabase
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SyncService {
   // Sync state signal
@@ -17,7 +17,7 @@ export class SyncService {
     status: 'pending',
     lastSyncTime: null,
     pendingCount: 0,
-    error: null
+    error: null,
   });
 
   // Public readonly signal
@@ -31,7 +31,7 @@ export class SyncService {
 
   constructor(
     private db: DatabaseService,
-    private supabase: SupabaseService
+    private supabase: SupabaseService,
   ) {
     this.initializeSync();
   }
@@ -66,7 +66,7 @@ export class SyncService {
     table: string,
     operation: 'insert' | 'update' | 'delete',
     recordId: string,
-    data: any
+    data: any,
   ): Promise<void> {
     const syncOp: SyncOperation = {
       table,
@@ -75,7 +75,7 @@ export class SyncService {
       data,
       timestamp: Date.now(),
       synced: false,
-      retryCount: 0
+      retryCount: 0,
     };
 
     await this.db.db.sync_queue.add(syncOp);
@@ -108,7 +108,7 @@ export class SyncService {
       // Get all unsynced operations
       const pendingOps = await this.db.db.sync_queue
         .where('synced')
-        .equals(false)
+        .equals(0)
         .sortBy('timestamp');
 
       if (pendingOps.length === 0) {
@@ -127,7 +127,7 @@ export class SyncService {
           // Mark as synced
           await this.db.db.sync_queue.update(op.id!, {
             synced: true,
-            error: undefined
+            error: undefined,
           });
         } catch (error: any) {
           console.error(`Error syncing operation ${op.id}:`, error);
@@ -139,12 +139,12 @@ export class SyncService {
             // Max retries reached, mark as error
             await this.db.db.sync_queue.update(op.id!, {
               error: error.message || 'Max retries reached',
-              retryCount
+              retryCount,
             });
           } else {
             // Increment retry count
             await this.db.db.sync_queue.update(op.id!, {
-              retryCount
+              retryCount,
             });
           }
         }
@@ -170,9 +170,7 @@ export class SyncService {
 
     switch (operation) {
       case 'insert':
-        const { error: insertError } = await this.supabase.client
-          .from(table)
-          .insert(data);
+        const { error: insertError } = await this.supabase.client.from(table).insert(data);
 
         if (insertError) throw insertError;
         break;
@@ -232,10 +230,7 @@ export class SyncService {
    * @param remote Remote record
    * @returns Winning record
    */
-  resolveConflict<T extends { updated_at: Date | string }>(
-    local: T,
-    remote: T
-  ): T {
+  resolveConflict<T extends { updated_at: Date | string }>(local: T, remote: T): T {
     const localTime = new Date(local.updated_at).getTime();
     const remoteTime = new Date(remote.updated_at).getTime();
 
@@ -256,14 +251,14 @@ export class SyncService {
   private updateSyncState(
     status: SyncStatus,
     error: string | null = null,
-    lastSyncTime: number | null = null
+    lastSyncTime: number | null = null,
   ): void {
     const currentState = this.syncStateSignal();
     this.syncStateSignal.set({
       ...currentState,
       status,
       error,
-      lastSyncTime: lastSyncTime !== null ? lastSyncTime : currentState.lastSyncTime
+      lastSyncTime: lastSyncTime !== null ? lastSyncTime : currentState.lastSyncTime,
     });
   }
 
@@ -271,15 +266,12 @@ export class SyncService {
    * Update pending count in sync state
    */
   private async updatePendingCount(): Promise<void> {
-    const count = await this.db.db.sync_queue
-      .where('synced')
-      .equals(false)
-      .count();
+    const count = await this.db.db.sync_queue.where('synced').equals(0).count();
 
     const currentState = this.syncStateSignal();
     this.syncStateSignal.set({
       ...currentState,
-      pendingCount: count
+      pendingCount: count,
     });
   }
 
@@ -287,10 +279,7 @@ export class SyncService {
    * Clear synced operations from queue (cleanup)
    */
   async clearSyncedOperations(): Promise<void> {
-    await this.db.db.sync_queue
-      .where('synced')
-      .equals(true)
-      .delete();
+    await this.db.db.sync_queue.where('synced').equals(1).delete();
 
     await this.updatePendingCount();
   }
@@ -305,18 +294,15 @@ export class SyncService {
   }> {
     const pending = await this.db.db.sync_queue
       .where('synced')
-      .equals(false)
+      .equals(0)
       .and(op => !op.error)
       .count();
 
-    const synced = await this.db.db.sync_queue
-      .where('synced')
-      .equals(true)
-      .count();
+    const synced = await this.db.db.sync_queue.where('synced').equals(1).count();
 
     const failed = await this.db.db.sync_queue
       .where('synced')
-      .equals(false)
+      .equals(0)
       .and(op => !!op.error)
       .count();
 

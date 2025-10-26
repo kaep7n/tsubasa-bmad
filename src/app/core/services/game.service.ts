@@ -9,7 +9,7 @@ import { Game, GameStatus } from '../models/game.model';
  * Handles game CRUD operations and queries
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameService {
   constructor(private supabase: SupabaseService) {}
@@ -19,7 +19,7 @@ export class GameService {
    * @param limit Number of games to return (default: 3)
    * @returns Observable<Game[]> sorted by date ascending
    */
-  getUpcomingGames(limit: number = 3): Observable<Game[]> {
+  getUpcomingGames(limit = 3): Observable<Game[]> {
     const today = new Date().toISOString().split('T')[0];
 
     return from(
@@ -29,7 +29,7 @@ export class GameService {
         .gte('date', today)
         .neq('status', 'completed')
         .order('date', { ascending: true })
-        .limit(limit)
+        .limit(limit),
     ).pipe(
       map(({ data, error }) => {
         if (error) {
@@ -38,7 +38,7 @@ export class GameService {
         }
         return data ? data.map(this.mapGameData) : [];
       }),
-      catchError(() => from([[]]))
+      catchError(() => from([[]])),
     );
   }
 
@@ -47,14 +47,14 @@ export class GameService {
    * @param limit Number of games to return (default: 5)
    * @returns Observable<Game[]> sorted by date descending
    */
-  getRecentGames(limit: number = 5): Observable<Game[]> {
+  getRecentGames(limit = 5): Observable<Game[]> {
     return from(
       this.supabase.client
         .from('games')
         .select('*')
         .eq('status', 'completed')
         .order('date', { ascending: false })
-        .limit(limit)
+        .limit(limit),
     ).pipe(
       map(({ data, error }) => {
         if (error) {
@@ -63,7 +63,7 @@ export class GameService {
         }
         return data ? data.map(this.mapGameData) : [];
       }),
-      catchError(() => from([[]]))
+      catchError(() => from([[]])),
     );
   }
 
@@ -73,13 +73,7 @@ export class GameService {
    * @returns Observable<Game | null>
    */
   getGameById(id: string): Observable<Game | null> {
-    return from(
-      this.supabase.client
-        .from('games')
-        .select('*')
-        .eq('id', id)
-        .single()
-    ).pipe(
+    return from(this.supabase.client.from('games').select('*').eq('id', id).single()).pipe(
       map(({ data, error }) => {
         if (error) {
           console.error('Error fetching game:', error);
@@ -87,7 +81,7 @@ export class GameService {
         }
         return data ? this.mapGameData(data) : null;
       }),
-      catchError(() => from([null]))
+      catchError(() => from([null])),
     );
   }
 
@@ -108,7 +102,7 @@ export class GameService {
       our_score: data.our_score || 0,
       opponent_score: data.opponent_score || 0,
       created_at: new Date(data.created_at),
-      updated_at: new Date(data.updated_at)
+      updated_at: new Date(data.updated_at),
     };
   }
 }

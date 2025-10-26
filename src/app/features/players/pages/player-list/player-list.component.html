@@ -1,0 +1,81 @@
+<div class="player-list-container">
+  <!-- Toolbar: Search, Filter, Sort -->
+  <div class="toolbar">
+    <!-- Search Bar -->
+    <mat-form-field class="search-field" appearance="outline">
+      <mat-label>Search players</mat-label>
+      <input matInput placeholder="Search by name..." (input)="onSearchChange($any($event.target).value)" />
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+    <div class="filters">
+      <!-- Squad Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Squad</mat-label>
+        <mat-select [value]="squadFilter()" (selectionChange)="onSquadFilterChange($event.value)">
+          <mat-option value="all">All Players</mat-option>
+          <mat-option value="starters">Starters</mat-option>
+          <mat-option value="substitutes">Substitutes</mat-option>
+          <mat-option value="unassigned">Unassigned</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Sort Dropdown -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Sort By</mat-label>
+        <mat-select [value]="sortBy()" (selectionChange)="onSortChange($event.value)">
+          <mat-option value="name">Name (A-Z)</mat-option>
+          <mat-option value="jersey">Jersey Number</mat-option>
+          <mat-option value="goals">Goals (Coming Soon)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Squad Management Button -->
+    <button mat-raised-button color="accent" (click)="navigateToSquadManagement()" class="squad-btn" title="Squad Management">
+      <mat-icon>groups</mat-icon>
+      <span>Manage Squad</span>
+    </button>
+
+    <!-- Refresh Button -->
+    <button mat-icon-button (click)="refreshPlayers()" class="refresh-btn" title="Refresh">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading players...</p>
+  </div>
+  } @else if (filteredPlayers().length === 0 && players().length === 0) {
+  <!-- Empty State -->
+  <div class="empty-state">
+    <mat-icon class="empty-icon">groups</mat-icon>
+    <h2>No players yet</h2>
+    <p>Tap the + button below to add your first player</p>
+  </div>
+  } @else if (filteredPlayers().length === 0) {
+  <!-- No Results State -->
+  <div class="empty-state">
+    <mat-icon class="empty-icon">search_off</mat-icon>
+    <h2>No players found</h2>
+    <p>Try adjusting your search or filters</p>
+  </div>
+  } @else {
+  <!-- Player Grid -->
+  <div class="player-grid">
+    @for (player of filteredPlayers(); track player.id) {
+    <div class="player-grid-item" (click)="viewPlayer(player.id)">
+      <app-player-card [player]="player" />
+    </div>
+    }
+  </div>
+  }
+
+  <!-- FAB: Add Player Button -->
+  <button mat-fab class="add-player-fab" color="primary" (click)="addPlayer()" title="Add Player">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

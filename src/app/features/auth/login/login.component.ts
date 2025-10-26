@@ -22,10 +22,10 @@ import { AuthService } from '../../../core/services/auth.service';
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
   private initializeForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]]
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
   }
 
@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit {
 
       // Successful login - check for team and redirect appropriately
       this.authService.checkAndRedirectAfterLogin();
-    } catch (error) {
+    } catch (_error) {
       this.errorMessage = 'An unexpected error occurred. Please try again.';
       this.loading = false;
     }
@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
       }
 
       // OAuth flow will redirect automatically
-    } catch (error) {
+    } catch (_error) {
       this.errorMessage = 'An unexpected error occurred with Google sign-in. Please try again.';
       this.loading = false;
     }

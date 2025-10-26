@@ -13,29 +13,23 @@ describe('SyncService', () => {
     // Create mock Supabase client
     mockSupabaseClient = {
       from: jasmine.createSpy('from').and.returnValue({
-        insert: jasmine.createSpy('insert').and.returnValue(
-          Promise.resolve({ data: null, error: null })
-        ),
+        insert: jasmine
+          .createSpy('insert')
+          .and.returnValue(Promise.resolve({ data: null, error: null })),
         update: jasmine.createSpy('update').and.returnValue({
-          eq: jasmine.createSpy('eq').and.returnValue(
-            Promise.resolve({ data: null, error: null })
-          )
+          eq: jasmine.createSpy('eq').and.returnValue(Promise.resolve({ data: null, error: null })),
         }),
         delete: jasmine.createSpy('delete').and.returnValue({
-          eq: jasmine.createSpy('eq').and.returnValue(
-            Promise.resolve({ data: null, error: null })
-          )
+          eq: jasmine.createSpy('eq').and.returnValue(Promise.resolve({ data: null, error: null })),
         }),
         select: jasmine.createSpy('select').and.returnValue({
-          gt: jasmine.createSpy('gt').and.returnValue(
-            Promise.resolve({ data: [], error: null })
-          )
-        })
-      })
+          gt: jasmine.createSpy('gt').and.returnValue(Promise.resolve({ data: [], error: null })),
+        }),
+      }),
     };
 
     mockSupabaseService = jasmine.createSpyObj('SupabaseService', [], {
-      client: mockSupabaseClient
+      client: mockSupabaseClient,
     });
 
     // Create mock database with sync_queue methods
@@ -46,26 +40,26 @@ describe('SyncService', () => {
           sortBy: jasmine.createSpy('sortBy').and.returnValue(Promise.resolve([])),
           count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0)),
           and: jasmine.createSpy('and').and.returnValue({
-            count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0))
+            count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0)),
           }),
-          delete: jasmine.createSpy('delete').and.returnValue(Promise.resolve())
-        })
+          delete: jasmine.createSpy('delete').and.returnValue(Promise.resolve()),
+        }),
       }),
-      update: jasmine.createSpy('update').and.returnValue(Promise.resolve(1))
+      update: jasmine.createSpy('update').and.returnValue(Promise.resolve(1)),
     };
 
     mockDbService = jasmine.createSpyObj('DatabaseService', ['clearAll', 'getStats'], {
       db: {
-        sync_queue: mockSyncQueue
-      }
+        sync_queue: mockSyncQueue,
+      },
     });
 
     TestBed.configureTestingModule({
       providers: [
         SyncService,
         { provide: DatabaseService, useValue: mockDbService },
-        { provide: SupabaseService, useValue: mockSupabaseService }
-      ]
+        { provide: SupabaseService, useValue: mockSupabaseService },
+      ],
     });
 
     service = TestBed.inject(SyncService);
@@ -95,8 +89,8 @@ describe('SyncService', () => {
           recordId: 'team-1',
           data: { name: 'Test Team' },
           synced: false,
-          retryCount: 0
-        })
+          retryCount: 0,
+        }),
       );
     });
 
@@ -116,13 +110,13 @@ describe('SyncService', () => {
       const local = {
         id: '1',
         name: 'Local',
-        updated_at: new Date('2024-01-01')
+        updated_at: new Date('2024-01-01'),
       };
 
       const remote = {
         id: '1',
         name: 'Remote',
-        updated_at: new Date('2024-01-02')
+        updated_at: new Date('2024-01-02'),
       };
 
       const result = service.resolveConflict(local, remote);
@@ -135,13 +129,13 @@ describe('SyncService', () => {
       const local = {
         id: '1',
         name: 'Local',
-        updated_at: new Date('2024-01-02')
+        updated_at: new Date('2024-01-02'),
       };
 
       const remote = {
         id: '1',
         name: 'Remote',
-        updated_at: new Date('2024-01-01')
+        updated_at: new Date('2024-01-01'),
       };
 
       const result = service.resolveConflict(local, remote);
@@ -154,13 +148,13 @@ describe('SyncService', () => {
       const local = {
         id: '1',
         name: 'Local',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       const remote = {
         id: '1',
         name: 'Remote',
-        updated_at: '2024-01-02T00:00:00Z'
+        updated_at: '2024-01-02T00:00:00Z',
       };
 
       const result = service.resolveConflict(local, remote);
@@ -190,8 +184,8 @@ describe('SyncService', () => {
           data: { name: 'Team 1' },
           timestamp: Date.now(),
           synced: false,
-          retryCount: 0
-        }
+          retryCount: 0,
+        },
       ];
 
       (mockDbService.db.sync_queue.where as jasmine.Spy).and.returnValue({
@@ -199,9 +193,9 @@ describe('SyncService', () => {
           sortBy: jasmine.createSpy('sortBy').and.returnValue(Promise.resolve(mockPendingOps)),
           count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0)),
           and: jasmine.createSpy('and').and.returnValue({
-            count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0))
-          })
-        })
+            count: jasmine.createSpy('count').and.returnValue(Promise.resolve(0)),
+          }),
+        }),
       });
 
       await service.processSyncQueue();
@@ -226,9 +220,9 @@ describe('SyncService', () => {
       const mockData = [{ id: '1', name: 'Team 1' }];
 
       mockSupabaseClient.from.and.returnValue({
-        select: jasmine.createSpy('select').and.returnValue(
-          Promise.resolve({ data: mockData, error: null })
-        )
+        select: jasmine
+          .createSpy('select')
+          .and.returnValue(Promise.resolve({ data: mockData, error: null })),
       });
 
       const result = await service.pullChanges('teams');
@@ -247,10 +241,10 @@ describe('SyncService', () => {
 
       mockSupabaseClient.from.and.returnValue({
         select: jasmine.createSpy('select').and.returnValue({
-          gt: (gtSpy = jasmine.createSpy('gt').and.returnValue(
-            Promise.resolve({ data: mockData, error: null })
-          ))
-        })
+          gt: (gtSpy = jasmine
+            .createSpy('gt')
+            .and.returnValue(Promise.resolve({ data: mockData, error: null }))),
+        }),
       });
 
       const result = await service.pullChanges('teams', lastSyncTime);
@@ -262,14 +256,14 @@ describe('SyncService', () => {
 
   describe('getSyncStats', () => {
     it('should return correct sync statistics', async () => {
-      (mockDbService.db.sync_queue.where as jasmine.Spy).and.callFake((field: string) => {
+      (mockDbService.db.sync_queue.where as jasmine.Spy).and.callFake((_field: string) => {
         return {
           equals: (value: boolean) => ({
-            and: (fn: any) => ({
-              count: () => Promise.resolve(value ? 2 : 3)
+            and: (_fn: unknown) => ({
+              count: () => Promise.resolve(value ? 2 : 3),
             }),
-            count: () => Promise.resolve(value ? 2 : 5)
-          })
+            count: () => Promise.resolve(value ? 2 : 5),
+          }),
         };
       });
 

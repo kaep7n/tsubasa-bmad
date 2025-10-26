@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, from } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { SupabaseService } from './supabase.service';
 import { User, AuthResponse } from '../models/user.model';
@@ -13,7 +13,7 @@ import { TeamService } from './team.service';
  * Maintains current user state and provides authentication methods
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
@@ -22,7 +22,7 @@ export class AuthService {
   constructor(
     private supabase: SupabaseService,
     private router: Router,
-    private teamService: TeamService
+    private teamService: TeamService,
   ) {
     // Initialize auth state from Supabase session
     this.initializeAuthState();
@@ -34,7 +34,9 @@ export class AuthService {
    */
   private async initializeAuthState(): Promise<void> {
     try {
-      const { data: { session } } = await this.supabase.client.auth.getSession();
+      const {
+        data: { session },
+      } = await this.supabase.client.auth.getSession();
       if (session?.user) {
         this.currentUserSubject.next(this.mapSupabaseUser(session.user));
       }
@@ -47,8 +49,8 @@ export class AuthService {
           this.currentUserSubject.next(null);
         }
       });
-    } catch (error) {
-      console.error('Error initializing auth state:', error);
+    } catch (_error) {
+      console.error('Error initializing auth state:', _error);
       this.currentUserSubject.next(null);
     }
   }
@@ -61,9 +63,13 @@ export class AuthService {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
       created_at: new Date(supabaseUser.created_at),
-      email_confirmed_at: supabaseUser.email_confirmed_at ? new Date(supabaseUser.email_confirmed_at) : undefined,
-      last_sign_in_at: supabaseUser.last_sign_in_at ? new Date(supabaseUser.last_sign_in_at) : undefined,
-      user_metadata: supabaseUser.user_metadata
+      email_confirmed_at: supabaseUser.email_confirmed_at
+        ? new Date(supabaseUser.email_confirmed_at)
+        : undefined,
+      last_sign_in_at: supabaseUser.last_sign_in_at
+        ? new Date(supabaseUser.last_sign_in_at)
+        : undefined,
+      user_metadata: supabaseUser.user_metadata,
     };
   }
 
@@ -77,34 +83,36 @@ export class AuthService {
     try {
       const { data, error } = await this.supabase.client.auth.signUp({
         email,
-        password
+        password,
       });
 
       if (error) {
         return {
           user: null,
           session: null,
-          error: { message: this.mapErrorMessage(error), status: error.status }
+          error: { message: this.mapErrorMessage(error), status: error.status },
         };
       }
 
       return {
         user: data.user ? this.mapSupabaseUser(data.user) : null,
-        session: data.session ? {
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-          expires_in: data.session.expires_in,
-          expires_at: data.session.expires_at,
-          token_type: data.session.token_type,
-          user: this.mapSupabaseUser(data.session.user)
-        } : null,
-        error: null
+        session: data.session
+          ? {
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+              expires_in: data.session.expires_in,
+              expires_at: data.session.expires_at,
+              token_type: data.session.token_type,
+              user: this.mapSupabaseUser(data.session.user),
+            }
+          : null,
+        error: null,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         user: null,
         session: null,
-        error: { message: 'An unexpected error occurred during sign up', status: 500 }
+        error: { message: 'An unexpected error occurred during sign up', status: 500 },
       };
     }
   }
@@ -119,34 +127,36 @@ export class AuthService {
     try {
       const { data, error } = await this.supabase.client.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) {
         return {
           user: null,
           session: null,
-          error: { message: this.mapErrorMessage(error), status: error.status }
+          error: { message: this.mapErrorMessage(error), status: error.status },
         };
       }
 
       return {
         user: data.user ? this.mapSupabaseUser(data.user) : null,
-        session: data.session ? {
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-          expires_in: data.session.expires_in,
-          expires_at: data.session.expires_at,
-          token_type: data.session.token_type,
-          user: this.mapSupabaseUser(data.session.user)
-        } : null,
-        error: null
+        session: data.session
+          ? {
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+              expires_in: data.session.expires_in,
+              expires_at: data.session.expires_at,
+              token_type: data.session.token_type,
+              user: this.mapSupabaseUser(data.session.user),
+            }
+          : null,
+        error: null,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         user: null,
         session: null,
-        error: { message: 'An unexpected error occurred during sign in', status: 500 }
+        error: { message: 'An unexpected error occurred during sign in', status: 500 },
       };
     }
   }
@@ -157,18 +167,18 @@ export class AuthService {
    */
   async signInWithGoogle(): Promise<AuthResponse> {
     try {
-      const { data, error } = await this.supabase.client.auth.signInWithOAuth({
+      const { error } = await this.supabase.client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (error) {
         return {
           user: null,
           session: null,
-          error: { message: this.mapErrorMessage(error), status: error.status }
+          error: { message: this.mapErrorMessage(error), status: error.status },
         };
       }
 
@@ -176,13 +186,13 @@ export class AuthService {
       return {
         user: null,
         session: null,
-        error: null
+        error: null,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         user: null,
         session: null,
-        error: { message: 'An unexpected error occurred during Google sign in', status: 500 }
+        error: { message: 'An unexpected error occurred during Google sign in', status: 500 },
       };
     }
   }
@@ -196,8 +206,8 @@ export class AuthService {
       await this.supabase.client.auth.signOut();
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
-    } catch (error) {
-      console.error('Error signing out:', error);
+    } catch (_error) {
+      console.error('Error signing out:', _error);
       // Even if sign out fails, clear local state and redirect
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
@@ -217,9 +227,7 @@ export class AuthService {
    * @returns Observable<boolean> true if authenticated
    */
   isAuthenticated(): Observable<boolean> {
-    return this.currentUser$.pipe(
-      map(user => user !== null)
-    );
+    return this.currentUser$.pipe(map(user => user !== null));
   }
 
   /**
@@ -227,10 +235,11 @@ export class AuthService {
    * Redirects to /team-setup if no team exists, otherwise to /dashboard
    */
   checkAndRedirectAfterLogin(): void {
-    this.teamService.getUserTeam()
+    this.teamService
+      .getUserTeam()
       .pipe(take(1))
       .subscribe({
-        next: (team) => {
+        next: team => {
           if (team) {
             // User has a team, redirect to dashboard
             this.router.navigate(['/dashboard']);
@@ -239,11 +248,11 @@ export class AuthService {
             this.router.navigate(['/team-setup']);
           }
         },
-        error: (error) => {
+        error: error => {
           console.error('Error checking team status:', error);
           // On error, default to team setup to be safe
           this.router.navigate(['/team-setup']);
-        }
+        },
       });
   }
 

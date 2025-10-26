@@ -9,7 +9,7 @@ import { AuthService } from '../services/auth.service';
  * Protects routes that should only be accessible to unauthenticated users
  * Redirects authenticated users to /dashboard
  */
-export const unauthGuard: CanActivateFn = (route, state) => {
+export const unauthGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -23,6 +23,6 @@ export const unauthGuard: CanActivateFn = (route, state) => {
       // User is authenticated, redirect to dashboard
       router.navigate(['/dashboard']);
       return false;
-    })
+    }),
   );
 };

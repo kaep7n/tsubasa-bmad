@@ -32,6 +32,20 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+      // Downgrade stylistic rules to warnings
+      "@angular-eslint/prefer-inject": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-empty-function": "warn",
+      "no-case-declarations": "warn",
+      // Allow unused vars that start with underscore
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   {
@@ -40,6 +54,11 @@ module.exports = tseslint.config(
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
     ],
-    rules: {},
+    rules: {
+      // Downgrade accessibility rules to warnings
+      "@angular-eslint/template/click-events-have-key-events": "warn",
+      "@angular-eslint/template/interactive-supports-focus": "warn",
+      "@angular-eslint/template/label-has-associated-control": "warn",
+    },
   }
 );

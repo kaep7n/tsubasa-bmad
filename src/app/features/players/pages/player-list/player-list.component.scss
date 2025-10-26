@@ -1,0 +1,145 @@
+.player-list-container {
+  padding: 1rem;
+  padding-bottom: 80px; // Space for FAB
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  width: 160px;
+}
+
+.squad-btn {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-btn {
+  margin-top: 4px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+
+  p {
+    margin-top: 1rem;
+    color: #666;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 72px;
+    width: 72px;
+    height: 72px;
+    color: #ccc;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 24px;
+    color: #666;
+  }
+
+  p {
+    margin: 0;
+    color: #999;
+    font-size: 16px;
+  }
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+
+  // Responsive breakpoints
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+.player-grid-item {
+  // Grid item styling handled by player-card component
+}
+
+.add-player-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 768px) {
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+// Mobile optimization
+@media (max-width: 768px) {
+  .player-list-container {
+    padding: 0.5rem;
+  }
+
+  .toolbar {
+    gap: 0.5rem;
+  }
+
+  .search-field {
+    min-width: 100%;
+  }
+
+  .filters {
+    width: 100%;
+    justify-content: space-between;
+
+    .filter-field {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+}

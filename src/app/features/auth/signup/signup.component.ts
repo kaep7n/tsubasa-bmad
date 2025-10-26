@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -24,10 +31,10 @@ import { AuthService } from '../../../core/services/auth.service';
     MatCardModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
   ],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.scss'
+  styleUrl: './signup.component.scss',
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;
@@ -42,7 +49,7 @@ export class SignupComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -50,13 +57,16 @@ export class SignupComponent implements OnInit {
   }
 
   private initializeForm(): void {
-    this.signupForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required]]
-    }, {
-      validators: this.passwordMatchValidator
-    });
+    this.signupForm = this.fb.group(
+      {
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      {
+        validators: this.passwordMatchValidator,
+      },
+    );
 
     this.signupForm.get('password')?.valueChanges.subscribe(password => {
       this.calculatePasswordStrength(password);
@@ -114,7 +124,7 @@ export class SignupComponent implements OnInit {
       this.successMessage = 'Account created successfully! Redirecting to login...';
       this.signupForm.reset();
       setTimeout(() => this.router.navigate(['/login']), 2000);
-    } catch (error) {
+    } catch (_error) {
       this.errorMessage = 'An unexpected error occurred. Please try again.';
       this.loading = false;
     }
@@ -145,16 +155,21 @@ export class SignupComponent implements OnInit {
   getConfirmPasswordErrorMessage(): string {
     const confirmPassword = this.signupForm.get('confirmPassword');
     if (confirmPassword?.hasError('required')) return 'Please confirm your password';
-    if (this.signupForm.hasError('passwordMismatch') && confirmPassword?.touched) return 'Passwords do not match';
+    if (this.signupForm.hasError('passwordMismatch') && confirmPassword?.touched)
+      return 'Passwords do not match';
     return '';
   }
 
   getPasswordStrengthColor(): string {
     switch (this.passwordStrength) {
-      case 'weak': return 'warn';
-      case 'medium': return 'accent';
-      case 'strong': return 'primary';
-      default: return 'warn';
+      case 'weak':
+        return 'warn';
+      case 'medium':
+        return 'accent';
+      case 'strong':
+        return 'primary';
+      default:
+        return 'warn';
     }
   }
 }

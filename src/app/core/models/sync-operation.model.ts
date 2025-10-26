@@ -12,7 +12,7 @@ export interface SyncOperation {
   table: string;
   operation: SyncOperationType;
   recordId: string;
-  data: any;
+  data: Record<string, unknown>;
   timestamp: number;
   synced: boolean;
   error?: string;

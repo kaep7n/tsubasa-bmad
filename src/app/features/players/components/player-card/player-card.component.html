@@ -1,0 +1,45 @@
+<mat-card class="player-card">
+  <div class="player-card-content">
+    <!-- Jersey Number Badge -->
+    @if (player().jersey_number) {
+      <div class="jersey-badge">
+        {{ player().jersey_number }}
+      </div>
+    }
+
+    <!-- Player Avatar -->
+    <div class="player-avatar">
+      @if (hasPhoto) {
+        <img [src]="player().photo_url" [alt]="fullName" class="avatar-image" />
+      } @else {
+        <div class="avatar-initials">
+          {{ initials }}
+        </div>
+      }
+    </div>
+
+    <!-- Player Info -->
+    <div class="player-info">
+      <h3 class="player-name">{{ fullName }}</h3>
+
+      <!-- Squad Badge -->
+      @if (player().squad) {
+        <span class="squad-badge" [class.starters]="player().squad === 'starters'">
+          {{ player().squad === 'starters' ? 'Starter' : 'Sub' }}
+        </span>
+      }
+
+      <!-- Quick Stats (placeholder for Story 2.7) -->
+      <div class="player-stats">
+        <span class="stat-item">
+          <span class="stat-label">Goals:</span>
+          <span class="stat-value">0</span>
+        </span>
+        <span class="stat-item">
+          <span class="stat-label">Attendance:</span>
+          <span class="stat-value">0%</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-card>

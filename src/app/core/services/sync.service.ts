@@ -106,10 +106,7 @@ export class SyncService {
 
     try {
       // Get all unsynced operations
-      const pendingOps = await this.db.db.sync_queue
-        .where('synced')
-        .equals(0)
-        .sortBy('timestamp');
+      const pendingOps = await this.db.db.sync_queue.where('synced').equals(0).sortBy('timestamp');
 
       if (pendingOps.length === 0) {
         this.updateSyncState('synced');

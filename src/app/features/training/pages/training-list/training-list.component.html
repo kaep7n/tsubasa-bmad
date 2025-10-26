@@ -1,0 +1,131 @@
+<div class="training-list-container">
+  <!-- Header with refresh button -->
+  <div class="header">
+    <h1>Training Sessions</h1>
+    <button
+      mat-icon-button
+      (click)="refreshSessions()"
+      [disabled]="isRefreshing()"
+      aria-label="Refresh sessions"
+    >
+      <mat-icon [class.spinning]="isRefreshing()">refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <!-- Filter Dropdown -->
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Filter</mat-label>
+      <mat-select [value]="filterType()" (selectionChange)="onFilterChange($event.value)">
+        <mat-option value="all">All Sessions</mat-option>
+        <mat-option value="upcoming">Upcoming</mat-option>
+        <mat-option value="past">Past</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Search Bar -->
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search location</mat-label>
+      <input matInput [value]="searchQuery()" (input)="onSearchChange($any($event.target).value)" />
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading Spinner -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else {
+    <!-- Sessions List -->
+    @if (filteredSessions().length === 0) {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <mat-icon>event_note</mat-icon>
+        @if (searchQuery() || filterType() !== 'all') {
+          <p>No sessions match your filters</p>
+          <p class="secondary-text">Try adjusting your search or filter</p>
+        } @else {
+          <p>No training sessions yet</p>
+          <p class="secondary-text">Tap + to schedule your first session</p>
+        }
+      </div>
+    } @else {
+      <!-- Session Cards -->
+      <div class="sessions-list">
+        @for (session of filteredSessions(); track session.id) {
+          <mat-card class="session-card" (click)="viewSession(session)" [class.past]="isPast(session.date)">
+            <mat-card-content>
+              <!-- Session Header -->
+              <div class="session-header">
+                <div class="session-date-time">
+                  <div class="date">
+                    {{ formatDate(session.date) }}
+                    @if (isToday(session.date)) {
+                      <span class="today-badge">Today</span>
+                    }
+                  </div>
+                  <div class="time">{{ formatTime(session.date) }}</div>
+                </div>
+
+                <button
+                  mat-icon-button
+                  (click)="deleteSession(session, $event)"
+                  class="delete-button"
+                  aria-label="Cancel session"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              <!-- Session Details -->
+              <div class="session-details">
+                <div class="detail-row">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ session.duration_minutes }} minutes</span>
+                </div>
+
+                @if (session.location) {
+                  <div class="detail-row">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ session.location }}</span>
+                  </div>
+                }
+
+                @if (session.notes) {
+                  <div class="detail-row">
+                    <mat-icon>notes</mat-icon>
+                    <span class="notes-preview">{{ session.notes }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Attendance Summary -->
+              @if (session.total_players > 0) {
+                <div class="attendance-section">
+                  <div class="attendance-header">
+                    <span class="attendance-label">Attendance</span>
+                    <span class="attendance-summary">{{ getAttendanceSummary(session) }}</span>
+                  </div>
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="getAttendancePercentage(session)"
+                    [class.low]="getAttendancePercentage(session) < 70"
+                    [class.medium]="getAttendancePercentage(session) >= 70 && getAttendancePercentage(session) < 90"
+                    [class.high]="getAttendancePercentage(session) >= 90"
+                  ></mat-progress-bar>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    }
+  }
+
+  <!-- FAB: Create Session Button -->
+  <button mat-fab class="fab" color="primary" (click)="createSession()" aria-label="Create training session">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

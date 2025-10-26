@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, from, throwError } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { Observable, from, throwError, BehaviorSubject } from 'rxjs';
+import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { SupabaseService } from './supabase.service';
 import { Team, CreateTeamRequest, TeamResponse } from '../models/team.model';
 import { getFileExtension } from '../../shared/utils/image-resize.util';
@@ -14,8 +14,27 @@ import { getFileExtension } from '../../shared/utils/image-resize.util';
 })
 export class TeamService {
   private readonly BUCKET_NAME = 'team-logos';
+  private currentTeamSubject = new BehaviorSubject<Team | null>(null);
 
-  constructor(private supabase: SupabaseService) {}
+  /**
+   * Observable of the current user's team
+   */
+  public readonly currentTeam$ = this.currentTeamSubject.asObservable();
+
+  constructor(private supabase: SupabaseService) {
+    // Load team on service initialization
+    this.loadUserTeam();
+  }
+
+  /**
+   * Load the current user's team into the currentTeam$ observable
+   */
+  private loadUserTeam(): void {
+    this.getUserTeam().subscribe({
+      next: team => this.currentTeamSubject.next(team),
+      error: error => console.error('Error loading team:', error),
+    });
+  }
 
   /**
    * Create a new team
@@ -49,8 +68,12 @@ export class TeamService {
           };
         }
 
+        const team = this.mapTeamData(data);
+        // Update current team subject
+        this.currentTeamSubject.next(team);
+
         return {
-          team: this.mapTeamData(data),
+          team,
           error: null,
         };
       }),
@@ -159,6 +182,7 @@ export class TeamService {
           }),
         );
       }),
+      tap(team => this.currentTeamSubject.next(team)),
       catchError(error => {
         console.error('Unexpected error fetching team:', error);
         return from([null]);

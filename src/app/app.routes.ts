@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'training',
+    loadChildren: () => import('./features/training/training.routes').then(m => m.TRAINING_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '/login',
   },

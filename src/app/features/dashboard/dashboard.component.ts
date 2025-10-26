@@ -78,25 +78,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadDashboardData(): void {
     this.isLoading.set(true);
 
-    combineLatest([
-      this.teamService.getUserTeam(),
-      this.gameService.getUpcomingGames(3),
-      this.trainingService.getUpcomingTrainingSessions(3),
-      this.gameService.getRecentGames(5),
-    ])
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isLoading.set(false)),
-      )
+    this.teamService
+      .getUserTeam()
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ([team, upcomingGames, upcomingTraining, recentGames]) => {
-          this.team.set(team);
-          this.upcomingGames.set(upcomingGames);
-          this.upcomingTraining.set(upcomingTraining);
-          this.recentGames.set(recentGames);
+        next: team => {
+          if (team) {
+            this.team.set(team);
+
+            combineLatest([
+              this.gameService.getUpcomingGames(3),
+              this.trainingService.getUpcomingTrainingSessions(team.id, 3),
+              this.gameService.getRecentGames(5),
+            ])
+              .pipe(
+                takeUntil(this.destroy$),
+                finalize(() => this.isLoading.set(false)),
+              )
+              .subscribe({
+                next: ([upcomingGames, upcomingTraining, recentGames]) => {
+                  this.upcomingGames.set(upcomingGames);
+                  this.upcomingTraining.set(upcomingTraining);
+                  this.recentGames.set(recentGames);
+                },
+                error: error => {
+                  console.error('Error loading dashboard data:', error);
+                },
+              });
+          } else {
+            this.isLoading.set(false);
+          }
         },
         error: error => {
-          console.error('Error loading dashboard data:', error);
+          console.error('Error loading team:', error);
+          this.isLoading.set(false);
         },
       });
   }
@@ -143,10 +158,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   /**
    * Get countdown text for event
-   * @param eventDate Event date
+   * @param eventDate Event date (Date or string)
    * @returns string (e.g., "Today", "Tomorrow", "in 3 days")
    */
-  getCountdown(eventDate: Date): string {
+  getCountdown(eventDate: Date | string): string {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const event = new Date(eventDate);
@@ -163,15 +178,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   /**
    * Format date to readable string
-   * @param date Date to format
+   * @param date Date to format (Date or string)
    * @returns string (e.g., "Mon, Jan 15")
    */
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
     return new Intl.DateTimeFormat('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
-    }).format(date);
+    }).format(new Date(date));
+  }
+
+  /**
+   * Format time from ISO string
+   * @param dateString ISO date string
+   * @returns string (e.g., "6:00 PM")
+   */
+  formatTime(dateString: string): string {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   }
 
   /**

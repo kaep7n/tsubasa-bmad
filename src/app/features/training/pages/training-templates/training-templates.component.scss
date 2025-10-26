@@ -1,0 +1,145 @@
+.training-templates-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.template-form-card {
+  margin-bottom: 32px;
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+
+    button {
+      min-width: 120px;
+
+      mat-spinner {
+        display: inline-block;
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+.templates-list-section {
+  h2 {
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: 500;
+    font-size: 20px;
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: rgba(0, 0, 0, 0.6);
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: rgba(0, 0, 0, 0.26);
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    .secondary-text {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.38);
+    }
+  }
+
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .template-card {
+    .template-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+
+      h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+        flex: 1;
+      }
+
+      .template-actions {
+        display: flex;
+        gap: 4px;
+
+        button {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+
+    .template-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 14px;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: rgba(0, 0, 0, 0.54);
+        }
+      }
+    }
+  }
+}

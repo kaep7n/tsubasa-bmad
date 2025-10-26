@@ -1,0 +1,122 @@
+<div class="training-stats-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Training Attendance Statistics</h1>
+    <button mat-raised-button color="primary" (click)="exportToCSV()">
+      <mat-icon>download</mat-icon>
+      Export to CSV
+    </button>
+  </div>
+
+  <!-- Date Range Filter -->
+  <mat-form-field appearance="outline" class="date-range-filter">
+    <mat-label>Date Range</mat-label>
+    <mat-select [value]="dateRange()" (selectionChange)="onDateRangeChange($event.value)">
+      <mat-option value="season">Season</mat-option>
+      <mat-option value="month">Last Month</mat-option>
+      <mat-option value="quarter">Last 3 Months</mat-option>
+      <mat-option value="all">All Time</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else {
+    <!-- Tabs for different views -->
+    <mat-tab-group>
+      <!-- Per-Session View -->
+      <mat-tab label="By Session">
+        <div class="tab-content">
+          @if (sessionStats().length === 0) {
+            <div class="empty-state">
+              <mat-icon>event_note</mat-icon>
+              <p>No training sessions yet</p>
+            </div>
+          } @else {
+            <div class="stats-list">
+              @for (session of sessionStats(); track session.sessionId) {
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div class="stat-date">
+                      <mat-icon>event</mat-icon>
+                      <span>{{ session.formattedDate }}</span>
+                    </div>
+                    @if (session.location) {
+                      <div class="stat-location">
+                        <mat-icon>place</mat-icon>
+                        <span>{{ session.location }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="stat-details">
+                    <div class="stat-summary">
+                      <span class="summary-text"
+                        >{{ session.attended }}/{{ session.totalPlayers }} attended</span
+                      >
+                      <span
+                        class="attendance-rate"
+                        [ngClass]="getAttendanceRateClass(session.attendanceRate)"
+                      >
+                        {{ session.attendanceRate }}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Per-Player View -->
+      <mat-tab label="By Player">
+        <div class="tab-content">
+          @if (playerStats().length === 0) {
+            <div class="empty-state">
+              <mat-icon>people</mat-icon>
+              <p>No player data yet</p>
+            </div>
+          } @else {
+            <div class="stats-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Player Name</th>
+                    <th>Total Sessions</th>
+                    <th>Attended</th>
+                    <th>Excused</th>
+                    <th>Absent</th>
+                    <th>Attendance Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (player of playerStats(); track player.playerId) {
+                    <tr>
+                      <td class="player-name">{{ player.playerName }}</td>
+                      <td>{{ player.totalSessions }}</td>
+                      <td class="stat-attended">{{ player.attended }}</td>
+                      <td class="stat-excused">{{ player.excused }}</td>
+                      <td class="stat-absent">{{ player.absent }}</td>
+                      <td>
+                        <span
+                          class="attendance-badge"
+                          [ngClass]="getAttendanceRateClass(player.attendanceRate)"
+                        >
+                          {{ player.attendanceRate }}%
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

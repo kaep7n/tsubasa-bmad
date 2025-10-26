@@ -1,0 +1,101 @@
+<div class="attendance-container">
+  <!-- Header with Summary -->
+  <div class="attendance-header">
+    <h3>Player Attendance</h3>
+    <div class="attendance-stats">
+      <span class="stat">{{ attendanceSummary().attended }}/{{ attendanceSummary().total }} attended</span>
+      <span class="stat-rate">{{ attendanceSummary().rate }}%</span>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <button mat-raised-button color="primary" (click)="markAllAttended()">
+      <mat-icon>check_circle</mat-icon>
+      Mark All Attended
+    </button>
+    <button mat-stroked-button (click)="resetAttendance()">
+      <mat-icon>refresh</mat-icon>
+      Reset
+    </button>
+  </div>
+
+  <!-- Search Filter -->
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search players</mat-label>
+    <input matInput [value]="searchQuery()" (input)="onSearchChange($any($event.target).value)" />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else {
+    <!-- Player List -->
+    @if (filteredPlayers().length === 0) {
+      <div class="empty-state">
+        <p>No players found</p>
+      </div>
+    } @else {
+      <div class="players-list">
+        @for (player of filteredPlayers(); track player.id) {
+          <div class="player-item">
+            <div class="player-info">
+              <div class="player-avatar">
+                @if (player.photo_url) {
+                  <img [src]="player.photo_url" [alt]="getPlayerName(player)" />
+                } @else {
+                  <div class="avatar-placeholder">
+                    {{ player.first_name.charAt(0) }}{{ player.last_name.charAt(0) }}
+                  </div>
+                }
+              </div>
+
+              <div class="player-details">
+                <div class="player-name">{{ getPlayerName(player) }}</div>
+                @if (player.jersey_number) {
+                  <div class="player-jersey">#{{ player.jersey_number }}</div>
+                }
+              </div>
+            </div>
+
+            <div class="attendance-controls">
+              <!-- Status Buttons -->
+              <button
+                mat-icon-button
+                [class.active]="player.attendance_status === 'attended'"
+                [class]="'status-btn status-attended'"
+                (click)="setAttendance(player, 'attended')"
+                aria-label="Mark attended"
+              >
+                <mat-icon>check_circle</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                [class.active]="player.attendance_status === 'excused'"
+                [class]="'status-btn status-excused'"
+                (click)="setAttendance(player, 'excused')"
+                aria-label="Mark excused"
+              >
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                [class.active]="player.attendance_status === 'absent'"
+                [class]="'status-btn status-absent'"
+                (click)="setAttendance(player, 'absent')"
+                aria-label="Mark absent"
+              >
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,97 @@
+<div class="training-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ getFormTitle() }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoading()) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        <form [formGroup]="sessionForm" (ngSubmit)="onSubmit()">
+          <!-- Template Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Template (optional)</mat-label>
+            <mat-select formControlName="session_template_id">
+              <mat-option [value]="null">None</mat-option>
+              @for (template of templates(); track template.id) {
+                <mat-option [value]="template.id">{{ template.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>Select a template to auto-fill duration and location</mat-hint>
+          </mat-form-field>
+
+          <!-- Date Picker -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" required />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (sessionForm.get('date')?.hasError('required')) {
+              <mat-error>Date is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Time Input -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Time</mat-label>
+            <input matInput type="time" formControlName="time" required />
+            @if (sessionForm.get('time')?.hasError('required')) {
+              <mat-error>Time is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Duration -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Duration (minutes)</mat-label>
+            <input matInput type="number" formControlName="duration_minutes" required />
+            @if (sessionForm.get('duration_minutes')?.hasError('required')) {
+              <mat-error>Duration is required</mat-error>
+            }
+            @if (sessionForm.get('duration_minutes')?.hasError('min')) {
+              <mat-error>Duration must be at least 1 minute</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Location -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location" placeholder="e.g., Main Field" />
+          </mat-form-field>
+
+          <!-- Notes -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea
+              matInput
+              formControlName="notes"
+              rows="4"
+              placeholder="Add any additional notes..."
+            ></textarea>
+          </mat-form-field>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <button mat-button type="button" (click)="cancel()" [disabled]="isSubmitting()">
+              Cancel
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="sessionForm.invalid || isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                {{ getSubmitButtonText() }}
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

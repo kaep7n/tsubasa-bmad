@@ -99,7 +99,7 @@
                 <div class="event-details">
                   <div class="event-title">Training Session</div>
                   <div class="event-info">
-                    {{ formatDate(training.date) }} · {{ training.start_time }}
+                    {{ formatDate(training.date) }} · {{ formatTime(training.date) }}
                     @if (training.duration_minutes) {
                       · {{ training.duration_minutes }} min
                     }

@@ -87,9 +87,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.team.set(team);
 
             combineLatest([
-              this.gameService.getUpcomingGames(3),
+              this.gameService.getUpcomingGames(team.id, 3),
               this.trainingService.getUpcomingTrainingSessions(team.id, 3),
-              this.gameService.getRecentGames(5),
+              this.gameService.getRecentGames(team.id, 5),
             ])
               .pipe(
                 takeUntil(this.destroy$),
@@ -147,9 +147,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * @returns GameResultBadge
    */
   getResultBadge(game: Game): GameResultBadge {
-    if (game.our_score > game.opponent_score) {
+    if (game.final_score_team === null || game.final_score_opponent === null) {
+      return { label: 'D', color: 'warning' }; // Default if no scores
+    }
+
+    if (game.final_score_team > game.final_score_opponent) {
       return { label: 'W', color: 'success' };
-    } else if (game.our_score < game.opponent_score) {
+    } else if (game.final_score_team < game.final_score_opponent) {
       return { label: 'L', color: 'error' };
     } else {
       return { label: 'D', color: 'warning' };
@@ -187,6 +191,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       month: 'short',
       day: 'numeric',
     }).format(new Date(date));
+  }
+
+  /**
+   * Format game time from ISO string
+   * @param dateString ISO date string
+   * @returns string (e.g., "6:00 PM")
+   */
+  formatGameTime(dateString: string): string {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   }
 
   /**

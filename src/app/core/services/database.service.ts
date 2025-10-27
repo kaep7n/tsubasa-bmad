@@ -2,14 +2,16 @@ import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 import { Team } from '../models/team.model';
 import { Game } from '../models/game.model';
+import { GameAttendance } from '../models/game-attendance.model';
 import { TrainingSession } from '../models/training-session.model';
 import { TrainingTemplate } from '../models/training-template.model';
 import { TrainingAttendance } from '../models/training-attendance.model';
 import { SyncOperation } from '../models/sync-operation.model';
 import { Player } from '../../models/player.model';
+import { StatsCache } from '../models/player-stats.model';
 
 /**
- * Goal interface (will be fully defined in Epic 4)
+ * Goal interface (will be fully defined in Epic 5)
  */
 export interface Goal {
   id: string;
@@ -17,7 +19,7 @@ export interface Goal {
   scorer_id: string;
   assist_id?: string;
   minute: number;
-  created_at: Date;
+  created_at: string;
 }
 
 /**
@@ -27,7 +29,7 @@ export interface GoalAssist {
   id: string;
   goal_id: string;
   player_id: string;
-  created_at: Date;
+  created_at: string;
 }
 
 /**
@@ -37,18 +39,7 @@ export interface OpponentGoal {
   id: string;
   game_id: string;
   minute: number;
-  created_at: Date;
-}
-
-/**
- * Game Attendance interface
- */
-export interface GameAttendance {
-  id: string;
-  game_id: string;
-  player_id: string;
-  status: 'present' | 'absent' | 'late';
-  created_at: Date;
+  created_at: string;
 }
 
 /**
@@ -68,6 +59,7 @@ export class TsubasaDatabase extends Dexie {
   game_attendance!: Table<GameAttendance, string>;
   training_attendance!: Table<TrainingAttendance, string>;
   sync_queue!: Table<SyncOperation, number>;
+  stats_cache!: Table<StatsCache, string>;
 
   constructor() {
     super('TsubasaDB');
@@ -79,8 +71,8 @@ export class TsubasaDatabase extends Dexie {
       // Players table - indexed by team_id for filtering
       players: 'id, team_id, jersey_number',
 
-      // Games table - indexed by coach_id and date for filtering
-      games: 'id, coach_id, date, status',
+      // Games table - indexed by team_id and date for filtering
+      games: 'id, team_id, date, status, calendar_sync_id',
 
       // Training templates table - indexed by team_id
       training_templates: 'id, team_id, name',
@@ -105,6 +97,9 @@ export class TsubasaDatabase extends Dexie {
 
       // Sync queue table - auto-increment id, indexed by timestamp and synced status
       sync_queue: '++id, timestamp, synced, table',
+
+      // Stats cache table - indexed by cache_key
+      stats_cache: 'cache_key, last_calculated',
     });
   }
 }
@@ -138,6 +133,7 @@ export class DatabaseService {
     await this.db.game_attendance.clear();
     await this.db.training_attendance.clear();
     await this.db.sync_queue.clear();
+    await this.db.stats_cache.clear();
   }
 
   /**

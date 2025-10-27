@@ -43,6 +43,17 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'games',
+    loadChildren: () => import('./features/games/games.routes').then(m => m.GAMES_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'statistics',
+    loadChildren: () =>
+      import('./features/statistics/statistics.routes').then(m => m.STATISTICS_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '/login',
   },

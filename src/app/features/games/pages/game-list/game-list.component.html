@@ -1,0 +1,211 @@
+<div class="game-list-container">
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading games...</p>
+    </div>
+  }
+
+  <!-- Game List Content -->
+  @if (!isLoading()) {
+    <!-- Header with filters and search -->
+    <div class="list-header">
+      <h1>Games</h1>
+
+      <!-- Filter chips -->
+      <div class="filter-chips">
+        <button
+          mat-stroked-button
+          [class.active]="filterType() === 'all'"
+          (click)="onFilterChange('all')"
+        >
+          All Games
+        </button>
+        <button
+          mat-stroked-button
+          [class.active]="filterType() === 'upcoming'"
+          (click)="onFilterChange('upcoming')"
+        >
+          Upcoming
+        </button>
+        <button
+          mat-stroked-button
+          [class.active]="filterType() === 'past'"
+          (click)="onFilterChange('past')"
+        >
+          Past
+        </button>
+        <button
+          mat-stroked-button
+          [class.active]="filterType() === 'cancelled'"
+          (click)="onFilterChange('cancelled')"
+        >
+          Cancelled
+        </button>
+      </div>
+
+      <!-- Search bar -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search opponent</mat-label>
+        <input
+          matInput
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Team name"
+        />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Refresh button -->
+      <button
+        mat-icon-button
+        (click)="refreshGames()"
+        [disabled]="isRefreshing()"
+        aria-label="Refresh games"
+      >
+        <mat-icon [class.spinning]="isRefreshing()">refresh</mat-icon>
+      </button>
+    </div>
+
+    <!-- Games list -->
+    @if (filteredGames().length > 0) {
+      <div class="games-list">
+        @for (game of filteredGames(); track game.id) {
+          <mat-card class="game-card" (click)="viewGame(game)">
+            <mat-card-content>
+              <div class="game-info">
+                <!-- Opponent -->
+                <div class="game-opponent">
+                  <h3>vs {{ game.opponent }}</h3>
+                  @if (game.home_away) {
+                    <span class="home-away-badge" [attr.data-type]="game.home_away">
+                      {{ game.home_away === 'home' ? 'Home' : 'Away' }}
+                    </span>
+                  }
+                </div>
+
+                <!-- Date and time -->
+                <div class="game-datetime">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ formatDate(game.date) }} · {{ formatTime(game.date) }}</span>
+                </div>
+
+                <!-- Location -->
+                @if (game.location) {
+                  <div class="game-location">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ game.location }}</span>
+                  </div>
+                }
+
+                <!-- Status badge -->
+                <div class="game-status">
+                  <span class="status-badge" [attr.data-status]="game.status">
+                    {{ getStatusLabel(game.status) }}
+                  </span>
+                </div>
+
+                <!-- Result (for completed games) -->
+                @if (game.status === 'completed' && getResultBadge(game)) {
+                  <div class="game-result">
+                    <span class="result-badge" [attr.data-result]="getResultBadge(game)!.color">
+                      {{ getResultBadge(game)!.label }}
+                    </span>
+                    <span class="result-score">
+                      {{ game.final_score_team }} - {{ game.final_score_opponent }}
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <!-- Actions -->
+              <div class="game-actions" (click)="$event.stopPropagation()">
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="gameMenu"
+                  aria-label="Game actions"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <mat-menu #gameMenu="matMenu">
+                  <button mat-menu-item (click)="viewGame(game)">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View Details</span>
+                  </button>
+                  @if (game.status === 'scheduled') {
+                    <button mat-menu-item (click)="editGame(game, $event)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Edit</span>
+                    </button>
+                    <button mat-menu-item (click)="cancelGame(game, $event)">
+                      <mat-icon>cancel</mat-icon>
+                      <span>Cancel Game</span>
+                    </button>
+                  }
+                  @if (!game.is_protected) {
+                    <button mat-menu-item (click)="deleteGame(game, $event)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  }
+                </mat-menu>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <mat-icon>sports_soccer</mat-icon>
+        <h2>No games found</h2>
+        @if (searchQuery()) {
+          <p>Try adjusting your search or filters</p>
+        } @else {
+          <p>No games yet - tap + to schedule your first game</p>
+        }
+      </div>
+    }
+  }
+
+  <!-- Floating Action Button (FAB) Menu -->
+  <div class="fab-container">
+    <button
+      mat-fab
+      color="primary"
+      class="fab-button"
+      [class.fab-open]="isFabOpen()"
+      (click)="toggleFab()"
+      aria-label="Quick actions"
+    >
+      <mat-icon>{{ isFabOpen() ? 'close' : 'add' }}</mat-icon>
+    </button>
+
+    <!-- Speed Dial Menu -->
+    @if (isFabOpen()) {
+      <div class="fab-menu">
+        <button
+          mat-mini-fab
+          color="accent"
+          class="fab-action"
+          (click)="createGame()"
+          aria-label="Manual entry"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+
+        <button
+          mat-mini-fab
+          color="accent"
+          class="fab-action"
+          (click)="importCalendar()"
+          aria-label="Import calendar"
+        >
+          <mat-icon>calendar_month</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+</div>

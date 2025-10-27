@@ -25,9 +25,7 @@ export const TRAINING_ROUTES: Routes = [
   {
     path: 'stats',
     loadComponent: () =>
-      import('./pages/training-stats/training-stats.component').then(
-        m => m.TrainingStatsComponent,
-      ),
+      import('./pages/training-stats/training-stats.component').then(m => m.TrainingStatsComponent),
   },
   {
     path: ':id',

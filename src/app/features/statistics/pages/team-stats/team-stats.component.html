@@ -1,0 +1,220 @@
+<div class="team-stats-container">
+  <!-- Header -->
+  <div class="stats-header">
+    <h1>
+      <mat-icon>insights</mat-icon>
+      Team Statistics
+    </h1>
+
+    <mat-form-field appearance="outline" class="date-range-field">
+      <mat-label>Date Range</mat-label>
+      <mat-select
+        [value]="dateRangeOption()"
+        (selectionChange)="onDateRangeChange($event.value)"
+      >
+        <mat-option value="all">All Time</mat-option>
+        <mat-option value="season">This Season</mat-option>
+        <mat-option value="quarter">Last 3 Months</mat-option>
+        <mat-option value="month">Last Month</mat-option>
+      </mat-select>
+      <mat-icon matPrefix>date_range</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading Spinner -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Calculating team statistics...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !hasData()) {
+    <div class="empty-state">
+      <mat-icon>sports_soccer</mat-icon>
+      <h2>No team statistics available</h2>
+      <p>Play your first game to see team statistics and performance metrics</p>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  @if (!isLoading() && hasData() && teamStats()) {
+    <section class="summary-cards" aria-label="Team performance summary">
+      <!-- Games Played Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>sports_score</mat-icon>
+          <mat-card-title>Games Played</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ teamStats()!.total_games_played }}</div>
+          <div class="stat-detail">
+            <span class="wins">{{ teamStats()!.wins }}W</span>
+            -
+            <span class="draws">{{ teamStats()!.draws }}D</span>
+            -
+            <span class="losses">{{ teamStats()!.losses }}L</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Goals For Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>sports_soccer</mat-icon>
+          <mat-card-title>Goals Scored</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ teamStats()!.total_goals_scored }}</div>
+          <div class="stat-detail">
+            {{
+              teamStats()!.total_games_played > 0
+                ? (teamStats()!.total_goals_scored / teamStats()!.total_games_played).toFixed(1)
+                : '0.0'
+            }}
+            per game
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Goals Against Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>shield</mat-icon>
+          <mat-card-title>Goals Conceded</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ teamStats()!.total_goals_conceded }}</div>
+          <div class="stat-detail">
+            {{
+              teamStats()!.total_games_played > 0
+                ? (teamStats()!.total_goals_conceded / teamStats()!.total_games_played).toFixed(1)
+                : '0.0'
+            }}
+            per game
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Goal Difference Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>trending_up</mat-icon>
+          <mat-card-title>Goal Difference</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div
+            class="stat-value"
+            [class]="getGoalDifferenceClass(teamStats()!.goal_difference)"
+          >
+            {{ formatGoalDifference(teamStats()!.goal_difference) }}
+          </div>
+          <div class="stat-detail">Win Rate: {{ teamStats()!.win_rate.toFixed(1) }}%</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Top Scorer Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>emoji_events</mat-icon>
+          <mat-card-title>Top Scorer</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-player">{{ getTopScorer() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Top Assister Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>volunteer_activism</mat-icon>
+          <mat-card-title>Top Assister</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-player">{{ getTopAssister() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Attendance Card -->
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon>people</mat-icon>
+          <mat-card-title>Avg Attendance</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ getAverageAttendance().toFixed(1) }}%</div>
+          <div class="stat-detail">Player availability</div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-section" aria-label="Performance charts">
+      <h2>Performance Charts</h2>
+
+      <!-- Top 5 Scorers Chart -->
+      @if (topScorersChart) {
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Top 5 Scorers</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <canvas
+                baseChart
+                [data]="topScorersChart"
+                [options]="horizontalBarOptions"
+                type="bar"
+                aria-label="Bar chart showing top 5 goal scorers"
+              >
+              </canvas>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Goals Timeline Chart -->
+      @if (goalsTimelineChart) {
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Goals Per Game Timeline</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <canvas
+                baseChart
+                [data]="goalsTimelineChart"
+                [options]="lineChartOptions"
+                type="line"
+                aria-label="Line chart showing goals scored and conceded over time"
+              >
+              </canvas>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Win Rate Chart -->
+      @if (winRateChart) {
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Win Rate Over Time</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <canvas
+                baseChart
+                [data]="winRateChart"
+                [options]="barChartOptions"
+                type="bar"
+                aria-label="Stacked bar chart showing wins, draws, and losses over time"
+              >
+              </canvas>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </section>
+  }
+</div>

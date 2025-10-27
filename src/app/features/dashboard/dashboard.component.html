@@ -75,10 +75,7 @@
                 <div class="event-details">
                   <div class="event-title">vs {{ game.opponent }}</div>
                   <div class="event-info">
-                    {{ formatDate(game.date) }}
-                    @if (game.start_time) {
-                      · {{ game.start_time }}
-                    }
+                    {{ formatDate(game.date) }} · {{ formatGameTime(game.date) }}
                     @if (game.location) {
                       · {{ game.location }}
                     }
@@ -145,7 +142,7 @@
                   <div class="result-date">{{ formatDate(game.date) }}</div>
                 </div>
                 <div class="result-score">
-                  {{ game.our_score }} - {{ game.opponent_score }}
+                  {{ game.final_score_team }} - {{ game.final_score_opponent }}
                 </div>
               </div>
             }

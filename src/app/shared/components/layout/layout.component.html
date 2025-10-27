@@ -1,0 +1,124 @@
+<div class="app-layout">
+  <!-- Offline Indicator -->
+  @if (!isOnline()) {
+    <div class="offline-banner">
+      <mat-icon>cloud_off</mat-icon>
+      <span>You are offline</span>
+    </div>
+  }
+
+  <!-- Desktop Layout: Toolbar + Sidenav -->
+  @if (!isMobile()) {
+    <!-- Top Toolbar -->
+    <mat-toolbar color="primary" class="app-toolbar">
+      <button mat-icon-button (click)="toggleSidenav()" aria-label="Toggle menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      @if (team()?.logo_url) {
+        <img [src]="team()!.logo_url" alt="Team logo" class="team-logo" />
+      } @else {
+        <mat-icon class="team-icon">groups</mat-icon>
+      }
+
+      <span class="team-name">{{ team()?.name || 'Tsubasa' }}</span>
+
+      <span class="spacer"></span>
+
+      <!-- Profile Menu -->
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="Profile menu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Sidenav Container -->
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav
+        #sidenav
+        mode="side"
+        [opened]="isSidenavOpen()"
+        class="app-sidenav"
+      >
+        <mat-nav-list>
+          @for (item of navItems; track item.route) {
+            <a
+              mat-list-item
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [class.active]="isRouteActive(item.route)"
+              (click)="navigateTo(item.route)"
+            >
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+            </a>
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+
+      <!-- Main Content -->
+      <mat-sidenav-content class="main-content">
+        <router-outlet />
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  }
+
+  <!-- Mobile Layout: Bottom Navigation -->
+  @if (isMobile()) {
+    <!-- Top Toolbar (Mobile) -->
+    <mat-toolbar color="primary" class="mobile-toolbar">
+      @if (team()?.logo_url) {
+        <img [src]="team()!.logo_url" alt="Team logo" class="team-logo" />
+      } @else {
+        <mat-icon class="team-icon">groups</mat-icon>
+      }
+
+      <span class="team-name">{{ team()?.name || 'Tsubasa' }}</span>
+
+      <span class="spacer"></span>
+
+      <!-- Profile Menu -->
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="Profile menu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Content -->
+    <div class="mobile-content">
+      <router-outlet />
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      @for (item of navItems; track item.route) {
+        @if (item.mobileVisible) {
+          <button
+            mat-button
+            class="nav-button"
+            [class.active]="isRouteActive(item.route)"
+            (click)="navigateTo(item.route)"
+          >
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <span>{{ item.label }}</span>
+          </button>
+        }
+      }
+    </nav>
+  }
+
+  <!-- Profile Menu (Shared) -->
+  <mat-menu #profileMenu="matMenu">
+    <button mat-menu-item (click)="navigateToProfile()">
+      <mat-icon>person</mat-icon>
+      <span>Profile</span>
+    </button>
+    <button mat-menu-item (click)="navigateToProfile()">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</div>

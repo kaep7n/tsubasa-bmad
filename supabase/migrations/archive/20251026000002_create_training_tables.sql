@@ -123,7 +123,7 @@ CREATE POLICY "Users can view their team's training templates"
   FOR SELECT
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -133,7 +133,7 @@ CREATE POLICY "Users can create training templates for their team"
   FOR INSERT
   WITH CHECK (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -143,7 +143,7 @@ CREATE POLICY "Users can update their team's training templates"
   FOR UPDATE
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -153,7 +153,7 @@ CREATE POLICY "Users can delete their team's training templates"
   FOR DELETE
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -167,7 +167,7 @@ CREATE POLICY "Users can view their team's training sessions"
   FOR SELECT
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
     AND deleted_at IS NULL
   );
@@ -178,7 +178,7 @@ CREATE POLICY "Users can create training sessions for their team"
   FOR INSERT
   WITH CHECK (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -188,7 +188,7 @@ CREATE POLICY "Users can update their team's training sessions"
   FOR UPDATE
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -198,7 +198,7 @@ CREATE POLICY "Users can delete their team's training sessions"
   FOR DELETE
   USING (
     team_id IN (
-      SELECT team_id FROM teams WHERE user_id = auth.uid()
+      SELECT id FROM teams WHERE created_by = auth.uid()
     )
   );
 
@@ -214,7 +214,7 @@ CREATE POLICY "Users can view attendance for their team's sessions"
     training_session_id IN (
       SELECT id FROM training_sessions
       WHERE team_id IN (
-        SELECT team_id FROM teams WHERE user_id = auth.uid()
+        SELECT id FROM teams WHERE created_by = auth.uid()
       )
     )
   );
@@ -227,7 +227,7 @@ CREATE POLICY "Users can create attendance for their team's sessions"
     training_session_id IN (
       SELECT id FROM training_sessions
       WHERE team_id IN (
-        SELECT team_id FROM teams WHERE user_id = auth.uid()
+        SELECT id FROM teams WHERE created_by = auth.uid()
       )
     )
   );
@@ -240,7 +240,7 @@ CREATE POLICY "Users can update attendance for their team's sessions"
     training_session_id IN (
       SELECT id FROM training_sessions
       WHERE team_id IN (
-        SELECT team_id FROM teams WHERE user_id = auth.uid()
+        SELECT id FROM teams WHERE created_by = auth.uid()
       )
     )
   );
@@ -253,7 +253,7 @@ CREATE POLICY "Users can delete attendance for their team's sessions"
     training_session_id IN (
       SELECT id FROM training_sessions
       WHERE team_id IN (
-        SELECT team_id FROM teams WHERE user_id = auth.uid()
+        SELECT id FROM teams WHERE created_by = auth.uid()
       )
     )
   );

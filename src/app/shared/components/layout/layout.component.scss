@@ -1,0 +1,197 @@
+.app-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Offline Banner
+.offline-banner {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 1000;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Desktop Layout
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .team-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 8px;
+    margin-right: 12px;
+  }
+
+  .team-icon {
+    margin-left: 8px;
+    margin-right: 12px;
+  }
+
+  .team-name {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+.sidenav-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-sidenav {
+  width: 250px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+
+  mat-nav-list {
+    padding-top: 8px;
+
+    a {
+      margin: 4px 8px;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &.active {
+        background-color: rgba(63, 81, 181, 0.12);
+        color: #3f51b5;
+
+        mat-icon {
+          color: #3f51b5;
+        }
+      }
+
+      mat-icon {
+        margin-right: 16px;
+      }
+    }
+  }
+}
+
+.main-content {
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+// Mobile Layout
+.mobile-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .team-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+  }
+
+  .team-icon {
+    margin-right: 8px;
+  }
+
+  .team-name {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+.mobile-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 64px; // Space for bottom nav
+  background-color: #f5f5f5;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+
+  .nav-button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border-radius: 0;
+    min-width: 0;
+    padding: 8px 12px;
+    transition: all 0.2s;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 4px;
+    }
+
+    span {
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.active {
+      color: #3f51b5;
+
+      mat-icon {
+        color: #3f51b5;
+      }
+    }
+  }
+}
+
+// Profile Menu
+mat-menu {
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .app-sidenav {
+    width: 200px;
+  }
+}

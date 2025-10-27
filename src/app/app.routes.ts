@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { unauthGuard } from './core/guards/unauth.guard';
+import { LayoutComponent } from './shared/components/layout/layout.component';
 
 export const routes: Routes = [
   {
@@ -26,32 +27,36 @@ export const routes: Routes = [
       import('./features/team/team-setup/team-setup.component').then(m => m.TeamSetupComponent),
     canActivate: [authGuard],
   },
+  // Authenticated routes with layout
   {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    path: '',
+    component: LayoutComponent,
     canActivate: [authGuard],
-  },
-  {
-    path: 'players',
-    loadChildren: () => import('./features/players/players.routes').then(m => m.PLAYERS_ROUTES),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'training',
-    loadChildren: () => import('./features/training/training.routes').then(m => m.TRAINING_ROUTES),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'games',
-    loadChildren: () => import('./features/games/games.routes').then(m => m.GAMES_ROUTES),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'statistics',
-    loadChildren: () =>
-      import('./features/statistics/statistics.routes').then(m => m.STATISTICS_ROUTES),
-    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+      },
+      {
+        path: 'players',
+        loadChildren: () => import('./features/players/players.routes').then(m => m.PLAYERS_ROUTES),
+      },
+      {
+        path: 'training',
+        loadChildren: () =>
+          import('./features/training/training.routes').then(m => m.TRAINING_ROUTES),
+      },
+      {
+        path: 'games',
+        loadChildren: () => import('./features/games/games.routes').then(m => m.GAMES_ROUTES),
+      },
+      {
+        path: 'statistics',
+        loadChildren: () =>
+          import('./features/statistics/statistics.routes').then(m => m.STATISTICS_ROUTES),
+      },
+    ],
   },
   {
     path: '**',

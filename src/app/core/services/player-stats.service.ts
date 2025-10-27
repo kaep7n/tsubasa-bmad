@@ -247,7 +247,7 @@ export class PlayerStatsService {
     const goals = await this.db.db.goals
       .where('game_id')
       .anyOf(gameIds)
-      .and(goal => goal.scorer_id === playerId)
+      .and(goal => goal.player_id === playerId)
       .toArray();
 
     return goals.length;

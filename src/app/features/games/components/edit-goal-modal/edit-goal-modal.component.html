@@ -1,0 +1,90 @@
+<div class="edit-goal-modal">
+  <h2 mat-dialog-title>Edit Goal</h2>
+
+  <mat-dialog-content>
+    @if (isLoading) {
+      <div class="loading-state">
+        <p>Loading goal data...</p>
+      </div>
+    } @else {
+      <form [formGroup]="editForm" class="edit-goal-form">
+        <!-- Scorer Selection -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Scorer</mat-label>
+          <mat-select formControlName="scorer" required>
+            @for (player of allPlayers; track player.id) {
+              <mat-option [value]="player.id">
+                {{ getPlayerDisplay(player) }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (editForm.get('scorer')?.hasError('required') && editForm.get('scorer')?.touched) {
+            <mat-error>Scorer is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Minute Input -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Minute</mat-label>
+          <input matInput type="number" formControlName="minute" min="0" max="120" required />
+          <mat-hint>Enter the minute the goal was scored (0-120)</mat-hint>
+          @if (editForm.get('minute')?.hasError('required') && editForm.get('minute')?.touched) {
+            <mat-error>Minute is required</mat-error>
+          }
+          @if (editForm.get('minute')?.hasError('min')) {
+            <mat-error>Minute must be at least 0</mat-error>
+          }
+          @if (editForm.get('minute')?.hasError('max')) {
+            <mat-error>Minute cannot exceed 120</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Assists Section -->
+        <div class="assists-section">
+          <div class="section-label">Assists</div>
+          <p class="section-hint">Select players who assisted this goal (optional)</p>
+
+          @if (availableAssistPlayers.length > 0) {
+            <div class="assists-list">
+              @for (player of availableAssistPlayers; track player.id) {
+                <div class="assist-item">
+                  <mat-checkbox
+                    [checked]="isAssistSelected(player.id)"
+                    (change)="toggleAssist(player.id)"
+                  >
+                    {{ getPlayerDisplay(player) }}
+                  </mat-checkbox>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="no-assists-message">No other players available for assists</p>
+          }
+        </div>
+
+        <!-- Notes Input -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea
+            matInput
+            formControlName="notes"
+            rows="3"
+            placeholder="Optional notes about this goal..."
+          ></textarea>
+        </mat-form-field>
+      </form>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSave()"
+      [disabled]="editForm.invalid || isLoading"
+    >
+      Save
+    </button>
+  </mat-dialog-actions>
+</div>

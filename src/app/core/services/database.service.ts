@@ -9,38 +9,9 @@ import { TrainingAttendance } from '../models/training-attendance.model';
 import { SyncOperation } from '../models/sync-operation.model';
 import { Player } from '../../models/player.model';
 import { StatsCache } from '../models/player-stats.model';
-
-/**
- * Goal interface (will be fully defined in Epic 5)
- */
-export interface Goal {
-  id: string;
-  game_id: string;
-  scorer_id: string;
-  assist_id?: string;
-  minute: number;
-  created_at: string;
-}
-
-/**
- * Goal Assist interface
- */
-export interface GoalAssist {
-  id: string;
-  goal_id: string;
-  player_id: string;
-  created_at: string;
-}
-
-/**
- * Opponent Goal interface
- */
-export interface OpponentGoal {
-  id: string;
-  game_id: string;
-  minute: number;
-  created_at: string;
-}
+import { Goal, GoalAssist, OpponentGoal } from '../models/goal.model';
+import { TimerState } from '../models/game-timer.model';
+import { PlayerUsageStats } from '../models/player-usage-stats.model';
 
 /**
  * TsubasaDatabase
@@ -60,11 +31,13 @@ export class TsubasaDatabase extends Dexie {
   training_attendance!: Table<TrainingAttendance, string>;
   sync_queue!: Table<SyncOperation, number>;
   stats_cache!: Table<StatsCache, string>;
+  timer_state!: Table<TimerState, string>;
+  player_usage_stats!: Table<PlayerUsageStats, string>;
 
   constructor() {
     super('TsubasaDB');
 
-    this.version(1).stores({
+    this.version(4).stores({
       // Teams table
       teams: 'id, created_by, name',
 
@@ -80,14 +53,14 @@ export class TsubasaDatabase extends Dexie {
       // Training sessions table - indexed by team_id and date
       training_sessions: 'id, team_id, date, session_template_id',
 
-      // Goals table - indexed by game_id and scorer_id
-      goals: 'id, game_id, scorer_id, minute',
+      // Goals table - indexed by game_id and player_id
+      goals: 'id, game_id, player_id, scored_at_minute',
 
       // Goal assists table - indexed by goal_id and player_id
       goal_assists: 'id, goal_id, player_id',
 
       // Opponent goals table - indexed by game_id
-      opponent_goals: 'id, game_id, minute',
+      opponent_goals: 'id, game_id, scored_at_minute',
 
       // Game attendance table - indexed by game_id and player_id
       game_attendance: 'id, game_id, player_id, status',
@@ -100,6 +73,12 @@ export class TsubasaDatabase extends Dexie {
 
       // Stats cache table - indexed by cache_key
       stats_cache: 'cache_key, last_calculated',
+
+      // Timer state table - indexed by gameId (primary key)
+      timer_state: 'gameId, isRunning, updatedAt',
+
+      // Player usage stats table - indexed by player_id (primary key)
+      player_usage_stats: 'player_id, usage_count, last_used_at',
     });
   }
 }
@@ -134,6 +113,8 @@ export class DatabaseService {
     await this.db.training_attendance.clear();
     await this.db.sync_queue.clear();
     await this.db.stats_cache.clear();
+    await this.db.timer_state.clear();
+    await this.db.player_usage_stats.clear();
   }
 
   /**

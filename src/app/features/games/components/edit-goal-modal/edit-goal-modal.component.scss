@@ -1,0 +1,125 @@
+.edit-goal-modal {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 600px;
+  width: 90vw;
+
+  @media (max-width: 600px) {
+    min-width: 280px;
+    max-width: 100vw;
+    width: 100vw;
+  }
+
+  h2[mat-dialog-title] {
+    margin: 0;
+    padding: 20px 24px;
+    font-size: 20px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+}
+
+mat-dialog-content {
+  padding: 24px;
+  overflow-y: auto;
+  max-height: 70vh;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: rgba(0, 0, 0, 0.54);
+
+  p {
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+.edit-goal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.assists-section {
+  margin-top: 8px;
+
+  .section-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+    margin-bottom: 8px;
+  }
+
+  .section-hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0 0 12px 0;
+  }
+
+  .assists-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.02);
+
+    .assist-item {
+      padding: 4px 0;
+
+      mat-checkbox {
+        width: 100%;
+      }
+    }
+  }
+
+  .no-assists-message {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.54);
+    font-style: italic;
+    margin: 8px 0;
+    padding: 16px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  gap: 12px;
+
+  button {
+    min-width: 80px;
+  }
+}
+
+// Material form field customization
+::ng-deep {
+  .edit-goal-modal {
+    mat-form-field {
+      .mat-mdc-form-field-hint-wrapper,
+      .mat-mdc-form-field-error-wrapper {
+        padding: 0 16px;
+      }
+    }
+  }
+}

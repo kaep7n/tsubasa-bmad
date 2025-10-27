@@ -1,0 +1,49 @@
+<header class="scoreboard"
+        [class.running]="getVisualState() === 'running'"
+        [class.half-time]="getVisualState() === 'half-time'"
+        [class.paused]="getVisualState() === 'paused'"
+        role="banner">
+
+  <!-- Team Score -->
+  <div class="score-container">
+    <div class="score"
+         [class.highlight]="teamScoreHighlight()"
+         aria-label="Team score">
+      {{ teamScore() }}
+    </div>
+  </div>
+
+  <!-- Timer Display -->
+  <div class="timer-container" (click)="openTimerAdjustDialog()">
+    <div class="timer" role="timer">
+      <time [attr.datetime]="'PT' + currentMinute() + 'M'">
+        {{ formatMinute(currentMinute()) }}
+      </time>
+    </div>
+    @if (isHalfTime()) {
+      <div class="half-time-banner">HALF TIME</div>
+    }
+
+    <!-- Sync Status Indicator -->
+    <div class="sync-status" [matTooltip]="syncTooltip()" matTooltipPosition="below">
+      <mat-icon [class]="syncIconClass()">{{ syncIcon() }}</mat-icon>
+    </div>
+  </div>
+
+  <!-- Opponent Score -->
+  <div class="score-container">
+    <div class="score"
+         [class.highlight]="opponentScoreHighlight()"
+         aria-label="Opponent score">
+      {{ opponentScore() }}
+    </div>
+  </div>
+
+  <!-- Accessibility: ARIA Live Region -->
+  <div class="sr-only"
+       role="status"
+       aria-live="polite"
+       aria-atomic="true">
+    {{ scoreAnnouncement() }}
+  </div>
+</header>

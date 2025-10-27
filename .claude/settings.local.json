@@ -22,7 +22,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(cat:*)",
-      "Bash(ng generate:*)"
+      "Bash(ng generate:*)",
+      "Bash(timeout 90 npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(ng build:*)"
     ],
     "deny": [],
     "ask": []

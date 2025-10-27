@@ -109,7 +109,7 @@ export class PlayerStatsService {
    *
    * Required tables (Epic 3 & 4):
    * - game_attendance: player_id, status ('attended' | 'excused' | 'unexcused')
-   * - goals: scorer_id, game_id
+   * - goals: player_id, game_id
    * - goal_assists: player_id, goal_id
    * - training_attendance: player_id, status ('attended' | 'excused' | 'unexcused')
    */
@@ -129,7 +129,7 @@ export class PlayerStatsService {
 
     // Count goals scored
     const goalsScored = await this.db.db.goals
-      .where('scorer_id')
+      .where('player_id')
       .equals(playerId)
       .count();
 

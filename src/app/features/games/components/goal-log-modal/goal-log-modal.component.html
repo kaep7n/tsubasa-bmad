@@ -1,0 +1,158 @@
+<div class="goal-log-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      @if (currentScreen() === 'scorer') {
+        Log Goal
+      } @else {
+        Add Assists?
+      }
+    </h2>
+
+    @if (currentScreen() === 'assists' && timeRemaining() > 0) {
+      <span class="timer-badge">{{ timeRemaining() }}s</span>
+    }
+
+    <button mat-icon-button mat-dialog-close aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    @if (currentScreen() === 'scorer') {
+      <!-- SCREEN 1: Scorer Selection (existing) -->
+      @if (showSearch()) {
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search players</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Type player name..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)"
+            autocomplete="off"
+          />
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      }
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Loading players...</p>
+        </div>
+      }
+
+      @if (!isLoading()) {
+        <div class="player-list">
+          <p class="hint-text">Tap to select scorer. Long-press to skip assists.</p>
+
+          @for (player of filteredPlayers(); track player.id) {
+            <button
+              class="player-item"
+              (mousedown)="onPlayerMouseDown(player)"
+              (mouseup)="onPlayerMouseUp(player)"
+              (mouseleave)="onPlayerMouseLeave()"
+              (touchstart)="onPlayerMouseDown(player)"
+              (touchend)="onPlayerMouseUp(player)"
+              (touchcancel)="onPlayerMouseLeave()"
+              [attr.aria-label]="'Log goal for ' + getPlayerDisplay(player)"
+            >
+              <div class="player-info">
+                <span class="player-name">
+                  @if (player.usageCount > 10) {
+                    <span class="star-indicator">⭐</span>
+                  }
+                  {{ getPlayerDisplay(player) }}
+                </span>
+                @if (player.goalCount > 0) {
+                  <span class="goal-badge" [matBadge]="player.goalCount" matBadgeColor="accent" matBadgeSize="small">
+                    ⚽
+                  </span>
+                }
+              </div>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          } @empty {
+            <div class="empty-state">
+              <mat-icon>person_off</mat-icon>
+              <p>No players found</p>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <!-- SCREEN 2: Assist Selection -->
+      <div class="player-list">
+        @for (player of assistPlayers(); track player.id) {
+          <button
+            class="player-item assist-item"
+            (click)="toggleAssist(player.id)"
+            [class.selected]="isAssistSelected(player.id)"
+            [attr.aria-label]="'Toggle assist for ' + getPlayerDisplay(player)"
+          >
+            <mat-checkbox
+              [checked]="isAssistSelected(player.id)"
+              (click)="$event.stopPropagation()"
+              (change)="toggleAssist(player.id)"
+            >
+            </mat-checkbox>
+
+            <div class="player-info">
+              <span class="player-name">
+                @if (player.usageCount > 10) {
+                  <span class="star-indicator">⭐</span>
+                }
+                {{ getPlayerDisplay(player) }}
+              </span>
+              @if (player.goalCount > 0) {
+                <span class="goal-badge" [matBadge]="player.goalCount" matBadgeColor="accent" matBadgeSize="small">
+                  ⚽
+                </span>
+              }
+            </div>
+          </button>
+        } @empty {
+          <div class="empty-state">
+            <mat-icon>person_off</mat-icon>
+            <p>No other players available</p>
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    @if (currentScreen() === 'scorer') {
+      <button
+        mat-raised-button
+        color="warn"
+        class="opponent-goal-button"
+        (click)="onOpponentGoalClick()"
+        aria-label="Log opponent goal"
+      >
+        <mat-icon>sports_soccer</mat-icon>
+        Opponent Goal
+      </button>
+    } @else {
+      <button
+        mat-button
+        class="skip-button"
+        (click)="saveGoalWithoutAssists(selectedScorer()!)"
+      >
+        Skip
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="save-button"
+        (click)="saveGoalWithSelectedAssists()"
+      >
+        Save
+        @if (selectedAssists().size > 0) {
+          ({{ selectedAssists().size }})
+        }
+      </button>
+    }
+  </mat-dialog-actions>
+</div>

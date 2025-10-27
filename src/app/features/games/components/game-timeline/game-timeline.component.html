@@ -1,0 +1,141 @@
+<div class="timeline-container" #timelineContainer>
+  @if (isLoading()) {
+    <div class="loading-state">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Loading events...</p>
+    </div>
+  }
+
+  @if (!isLoading() && isEmpty()) {
+    <div class="empty-state">
+      <mat-icon>sports_soccer</mat-icon>
+      <p>No goals yet - tap the + button to start tracking</p>
+    </div>
+  }
+
+  @if (!isLoading() && !isEmpty()) {
+    <ul class="timeline-list" role="list" aria-label="Game events timeline">
+      @for (event of events(); track trackByEvent($index, event)) {
+        @if (event.type === 'half_time') {
+          <!-- Half-time divider -->
+          <li class="timeline-event half-time-marker" role="separator" aria-label="Half time">
+            <div class="half-time-line"></div>
+            <span class="half-time-label">HALF TIME</span>
+            <div class="half-time-line"></div>
+          </li>
+        } @else {
+          <!-- Goal or Opponent Goal event -->
+          <li
+            class="timeline-event"
+            [class.goal-event]="event.type === 'goal'"
+            [class.opponent-goal-event]="event.type === 'opponent_goal'"
+            [class.expanded]="event.expanded"
+            (click)="toggleExpand(event)"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="'Event at minute ' + event.minute + ': ' + event.description"
+            [attr.aria-expanded]="event.expanded || false"
+            (keydown.enter)="toggleExpand(event)"
+            (keydown.space)="toggleExpand(event); $event.preventDefault()"
+          >
+            <div class="event-header">
+              <div class="event-left">
+                <span class="event-minute">{{ formatMinute(event.minute) }}</span>
+                <mat-icon class="event-icon">
+                  @if (event.type === 'goal') {
+                    sports_soccer
+                  } @else {
+                    warning
+                  }
+                </mat-icon>
+              </div>
+
+              <div class="event-description">
+                {{ event.description }}
+
+                <!-- Sync Status Badge -->
+                @if (event.syncState) {
+                  <span [class]="getSyncClass(event.syncState)" [matTooltip]="getSyncTooltip(event.syncState)">
+                    <mat-icon class="sync-badge-icon">{{ getSyncIcon(event.syncState) }}</mat-icon>
+                  </span>
+                }
+              </div>
+
+              <div class="event-actions">
+                <button
+                  mat-icon-button
+                  class="action-button"
+                  (click)="onEdit(event); $event.stopPropagation()"
+                  [attr.aria-label]="'Edit event at minute ' + event.minute"
+                  matTooltip="Edit"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  class="action-button"
+                  (click)="onDelete(event); $event.stopPropagation()"
+                  [attr.aria-label]="'Delete event at minute ' + event.minute"
+                  matTooltip="Delete"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+
+                <mat-icon class="expand-icon">
+                  {{ event.expanded ? 'expand_less' : 'expand_more' }}
+                </mat-icon>
+              </div>
+            </div>
+
+            @if (event.expanded) {
+              <div class="event-details" role="region" [attr.aria-label]="'Details for event at minute ' + event.minute">
+                @if (event.type === 'goal') {
+                  <div class="detail-row">
+                    <span class="detail-label">Scorer:</span>
+                    <span class="detail-value">{{ event.scorerName }}</span>
+                  </div>
+
+                  @if (event.assistNames && event.assistNames.length > 0) {
+                    <div class="detail-row">
+                      <span class="detail-label">Assists:</span>
+                      <span class="detail-value">{{ event.assistNames.join(', ') }}</span>
+                    </div>
+                  }
+
+                  @if (event.timestamp) {
+                    <div class="detail-row">
+                      <span class="detail-label">Time:</span>
+                      <span class="detail-value">{{ formatTimestamp(event.timestamp) }}</span>
+                    </div>
+                  }
+
+                  @if (event.data.notes) {
+                    <div class="detail-row">
+                      <span class="detail-label">Notes:</span>
+                      <span class="detail-value">{{ event.data.notes }}</span>
+                    </div>
+                  }
+                } @else if (event.type === 'opponent_goal') {
+                  @if (event.timestamp) {
+                    <div class="detail-row">
+                      <span class="detail-label">Time:</span>
+                      <span class="detail-value">{{ formatTimestamp(event.timestamp) }}</span>
+                    </div>
+                  }
+
+                  @if (event.data.notes) {
+                    <div class="detail-row">
+                      <span class="detail-label">Notes:</span>
+                      <span class="detail-value">{{ event.data.notes }}</span>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </li>
+        }
+      }
+    </ul>
+  }
+</div>
